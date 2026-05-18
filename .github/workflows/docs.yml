@@ -20,16 +20,19 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install mkdocs-material
+        run: pip install sphinx myst-parser sphinx-book-theme sphinx-design linkify-it-py
 
       - name: Build docs
-        run: mkdocs build --site-dir site
+        run: |
+          cd docs
+          make docs
+          touch build/html/.nojekyll
 
       - name: Deploy to gh-pages at /docs
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: ./site
+          publish_dir: ./docs/build/html
           destination_dir: docs
           keep_files: true

@@ -1,46 +1,122 @@
-# opendesk documentation
+# opendesk
 
-**Open Computer Use Agent** — gives any AI agent eyes and hands on your desktop. Works on macOS, Linux, and Windows.
+**Open Computer Use Agent** — gives any AI agent eyes and hands on your desktop. Works with any MCP client (Claude Code, Cursor, Windsurf, Continue) and any AI framework (Anthropic SDK, OpenAI, LangChain). Runs on macOS, Linux, and Windows.
 
-## Contents
+```{toctree}
+:maxdepth: 2
+:caption: Getting Started
 
-| Doc | Description |
-|-----|-------------|
-| [Quickstart](quickstart.md) | Install, first screenshot, agentic loop |
-| [MCP integration](mcp.md) | Add opendesk to Claude Code, Claude Desktop, Cursor, Continue |
-| [Automation](automation.md) | Record, replay, and schedule desktop tasks |
-| [Tools reference](tools.md) | Full parameter docs for every tool |
-| [Integrations](integrations.md) | Anthropic SDK, OpenAI, LangChain |
-| [Remote control](remote.md) | Pair machines, run the daemon, security model, CLI reference |
-| [Architecture](architecture.md) | How the layers fit together, how to add custom tools |
-| [Protocol](protocol.md) | Wire format, handshakes, frames, encryption, mDNS |
+getting-started/index
+getting-started/python
+getting-started/javascript
+```
 
-## Key concepts
+```{toctree}
+:maxdepth: 2
+:caption: MCP
 
-### Tool priority
+mcp/index
+mcp/install
+mcp/claude-code
+mcp/claude-desktop
+mcp/cursor
+mcp/continue
+mcp/advanced
+mcp/troubleshooting
+```
 
-Always follow this order:
+```{toctree}
+:maxdepth: 2
+:caption: Integrations
 
-1. `ui` — click by element name via accessibility tree
-2. `screenshot` — Set-of-Marks overlay
-3. `mouse` — fallback for unlabelled canvas areas
+integrations/index
+integrations/anthropic
+integrations/openai
+integrations/langchain
+integrations/javascript
+integrations/custom
+```
 
-### Set-of-Marks (SoM)
+```{toctree}
+:maxdepth: 2
+:caption: Tools
 
-The screenshot tool draws numbered bounding boxes over every interactive element using data from the platform's native accessibility API (AppleScript on macOS, AT-SPI2 on Linux, UI Automation on Windows). The model can say "click mark 3" instead of guessing pixel coordinates.
+tools/index
+tools/ui
+tools/screenshot
+tools/mouse
+tools/keyboard
+tools/app
+tools/clipboard
+tools/ocr
+tools/audit
+tools/learn
+```
 
-### HiDPI scaling
+```{toctree}
+:maxdepth: 2
+:caption: Automation
 
-On high-resolution displays (Retina, 4K), screenshot pixels ≠ logical pixels. Pass `image_width` and `image_height` from the screenshot result to the mouse tool and coordinates are translated automatically.
+automation/index
+automation/claude-code
+automation/python-api
+automation/scheduler
+```
 
-### Learn & replay
+```{toctree}
+:maxdepth: 2
+:caption: Architecture
 
-The `learn` tool records any desktop workflow (mouse, keyboard, screenshots) and summarizes it into a reusable procedure. Replay it later and the agent re-executes the steps using the current screen state — no hardcoded coordinates or paths.
+architecture/index
+architecture/layers
+architecture/protocol-layer
+architecture/remote-layer
+architecture/data-flow
+architecture/custom-tools
+```
 
-### Permission model
+```{toctree}
+:maxdepth: 2
+:caption: Protocol
 
-Every action goes through `ToolContext.check_permission()` before execution. `allow_all_context()` approves everything; `interactive_context()` prompts in the terminal; or inject a custom async callable for your own policy engine.
+protocol/index
+protocol/transport
+protocol/encryption
+protocol/pairing
+protocol/auth
+protocol/frames
+protocol/session
+protocol/discovery
+```
 
-### Sandbox
+```{toctree}
+:maxdepth: 2
+:caption: Remote — Python
 
-Each session has a `ComputerSandbox` that records a full audit log, enforces an app allow-list, and can restrict interactions to a screen region.
+remote/index
+remote/setup
+remote/running
+remote/mcp
+remote/security
+remote/cli
+remote/service
+remote/concurrency
+remote/programmatic
+remote/troubleshooting
+```
+
+```{toctree}
+:maxdepth: 2
+:caption: Remote — JS/TS
+
+remote-js/index
+remote-js/setup
+remote-js/running
+remote-js/mcp
+remote-js/audit
+remote-js/security
+remote-js/cli
+remote-js/concurrency
+remote-js/programmatic
+remote-js/troubleshooting
+```
