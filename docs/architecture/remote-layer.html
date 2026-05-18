@@ -1,0 +1,640 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Remote &amp; Integrations Layers &#8212; opendesk</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=7f7c277e"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'architecture/remote-layer';</script>
+    <link rel="canonical" href="https://vitalops.github.io/opendesk/docs/architecture/remote-layer.html" />
+    <link rel="icon" href="../_static/logo.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data Flow" href="data-flow.html" />
+    <link rel="prev" title="Protocol Layer" href="protocol-layer.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+<aside class="bd-header-announcement" aria-label="Announcement">
+  <div class="bd-header-announcement__content">opendesk — Open Computer Use Agent for any AI framework</div>
+</aside>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo.png" class="logo__image only-light" alt="opendesk - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-dark pst-js-only" alt="opendesk - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/python.html">Python Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/javascript.html">JavaScript / TypeScript Quickstart</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">MCP</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../mcp/index.html">MCP Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/claude-code.html">Claude Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/claude-desktop.html">Claude Desktop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/cursor.html">Cursor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/continue.html">Continue (VS Code)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/advanced.html">Advanced: In-process Server &amp; Restrictions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcp/troubleshooting.html">Troubleshooting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Integrations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../integrations/index.html">Integrations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../integrations/anthropic.html">Anthropic SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../integrations/openai.html">OpenAI Function Calling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../integrations/langchain.html">LangChain / LangGraph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../integrations/javascript.html">JavaScript / TypeScript SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../integrations/custom.html">Custom / Generic Integration</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/ui.html"><code class="docutils literal notranslate"><span class="pre">ui</span></code> — Accessibility-based UI Interaction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/screenshot.html"><code class="docutils literal notranslate"><span class="pre">screenshot</span></code> — Screen Capture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/mouse.html"><code class="docutils literal notranslate"><span class="pre">mouse</span></code> — Mouse Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/keyboard.html"><code class="docutils literal notranslate"><span class="pre">keyboard</span></code> — Keyboard Input</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/app.html"><code class="docutils literal notranslate"><span class="pre">app</span></code> — Application Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/clipboard.html"><code class="docutils literal notranslate"><span class="pre">clipboard</span></code> — Clipboard Read/Write</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/ocr.html"><code class="docutils literal notranslate"><span class="pre">ocr</span></code> — Text Extraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/audit.html"><code class="docutils literal notranslate"><span class="pre">audit</span></code> — Session Audit Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/learn.html"><code class="docutils literal notranslate"><span class="pre">learn</span></code> — Record and Replay Tasks</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Automation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../automation/index.html">Automation — Learn, Replay &amp; Schedule</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../automation/claude-code.html">Automation in Claude Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../automation/python-api.html">Python API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../automation/scheduler.html">Scheduler</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Architecture</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html">Computer &amp; Tools Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="protocol-layer.html">Protocol Layer</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Remote &amp; Integrations Layers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-flow.html">Data Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-tools.html">Adding a Custom Tool</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Protocol</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../protocol/index.html">Protocol Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/transport.html">Transport &amp; Encoding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/encryption.html">Encryption &amp; Identity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/pairing.html">Pairing Handshake</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/auth.html">Auth Handshake</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/frames.html">Frames &amp; Errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/session.html">Session Lifecycle &amp; Method Namespace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../protocol/discovery.html">Discovery, Admin IPC &amp; Cryptographic Summary</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Remote — Python</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../remote/index.html">Remote Computer Use — Python / CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/setup.html">One-time Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/running.html">Running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/mcp.html">MCP Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/security.html">Trust &amp; Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/cli.html">CLI Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/service.html">Service Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/concurrency.html">Concurrency: One Controller at a Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/programmatic.html">Programmatic Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote/troubleshooting.html">Troubleshooting</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Remote — JS/TS</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/index.html">Remote Computer Use — JavaScript / TypeScript SDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/setup.html">One-time Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/running.html">Running</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/mcp.html">MCP Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/audit.html">Audit Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/security.html">Trust &amp; Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/cli.html">CLI Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/concurrency.html">Concurrency: One Controller at a Time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/programmatic.html">Programmatic Use</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remote-js/troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/vitalops/opendesk" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/vitalops/opendesk/issues/new?title=Issue%20on%20page%20%2Farchitecture/remote-layer.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/architecture/remote-layer.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Remote & Integrations Layers</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-4-remote">Layer 4: <code class="docutils literal notranslate"><span class="pre">remote/</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-5-integrations">Layer 5: <code class="docutils literal notranslate"><span class="pre">integrations/</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mcp-py"><code class="docutils literal notranslate"><span class="pre">mcp.py</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mcpsession-mcp-session-py"><code class="docutils literal notranslate"><span class="pre">MCPSession</span></code> (<code class="docutils literal notranslate"><span class="pre">mcp_session.py</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-code-py-openai-compat-py-langchain-compat-py"><code class="docutils literal notranslate"><span class="pre">claude_code.py</span></code>, <code class="docutils literal notranslate"><span class="pre">openai_compat.py</span></code>, <code class="docutils literal notranslate"><span class="pre">langchain_compat.py</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="remote-integrations-layers">
+<h1>Remote &amp; Integrations Layers<a class="headerlink" href="#remote-integrations-layers" title="Link to this heading">#</a></h1>
+<section id="layer-4-remote">
+<h2>Layer 4: <code class="docutils literal notranslate"><span class="pre">remote/</span></code><a class="headerlink" href="#layer-4-remote" title="Link to this heading">#</a></h2>
+<p>User-facing stitching for the LAN flow.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">server.py</span></code> — <code class="docutils literal notranslate"><span class="pre">OpendeskServer</span></code>. Accepts WebSocket connections, runs the
+right handshake (pair vs. auth), wraps each session in a <code class="docutils literal notranslate"><span class="pre">Peer</span></code> +
+<code class="docutils literal notranslate"><span class="pre">ComputerDispatcher</span></code>, tracks sessions in a <code class="docutils literal notranslate"><span class="pre">SessionRegistry</span></code>.
+<code class="docutils literal notranslate"><span class="pre">enable_pairing(code)</span></code> flips into one-shot pairing mode.</p>
+<p><strong>Single-controller policy:</strong> at most one peer holds an active session
+at any moment. Same-peer reconnect bumps the previous session (the
+common case after a Wi-Fi blip or controller crash). A <em>different</em>
+peer hitting an active server gets rejected with <code class="docutils literal notranslate"><span class="pre">ErrorCode.BUSY</span></code> —
+carried on the HELLO frame so the client raises a clean
+<code class="docutils literal notranslate"><span class="pre">ProtocolError</span></code> instead of seeing a generic disconnect. Two
+controllers fighting over the same mouse / keyboard is the failure
+mode this prevents; multi-session / observer support is a phase-2
+design item with its own session-kind, not a numeric knob.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">policy.py</span></code> — <code class="docutils literal notranslate"><span class="pre">Policy</span></code> Protocol + <code class="docutils literal notranslate"><span class="pre">AllowAllPolicy</span></code> (default) and
+<code class="docutils literal notranslate"><span class="pre">ConsolePolicy</span></code> (stdin-prompts gated methods, auto-allows observations).
+Server-side gate applied per call.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">audit.py</span></code> — <code class="docutils literal notranslate"><span class="pre">AuditLog</span></code>. Append-only JSONL at
+<code class="docutils literal notranslate"><span class="pre">&lt;home&gt;/audit/YYYY-MM-DD.jsonl</span></code>. Records session lifecycle plus every
+protocol method invocation with outcome.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">admin.py</span></code> — local Unix-socket (or Windows named-pipe) IPC. Used by
+<code class="docutils literal notranslate"><span class="pre">opendesk</span> <span class="pre">sessions</span></code>, <code class="docutils literal notranslate"><span class="pre">opendesk</span> <span class="pre">disconnect</span></code>, and <code class="docutils literal notranslate"><span class="pre">opendesk</span> <span class="pre">unpair</span></code> /
+<code class="docutils literal notranslate"><span class="pre">opendesk</span> <span class="pre">peers</span> <span class="pre">remove</span></code> (which both kick the active session via this
+channel when revoking trust). Local-only, no network exposure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">service.py</span></code> — generates systemd / launchd / Task Scheduler entries
+for <code class="docutils literal notranslate"><span class="pre">opendesk</span> <span class="pre">serve</span></code> (one-command install / uninstall).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discovery.py</span></code> — <code class="docutils literal notranslate"><span class="pre">advertise(name,</span> <span class="pre">port,</span> <span class="pre">public_key)</span></code> and <code class="docutils literal notranslate"><span class="pre">discover(timeout)</span></code>
+via Zeroconf. Service type <code class="docutils literal notranslate"><span class="pre">_opendesk._tcp.local.</span></code> with TXT records
+carrying the host’s public key + fingerprint.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">client.py</span></code> — <code class="docutils literal notranslate"><span class="pre">connect(target)</span></code> (auto-reconnect on transient drops by
+default) and <code class="docutils literal notranslate"><span class="pre">pair_with(host,</span> <span class="pre">port,</span> <span class="pre">code)</span></code>. Resolves a peer name →
+mDNS → WebSocket → <code class="docutils literal notranslate"><span class="pre">auth_client</span></code> → <code class="docutils literal notranslate"><span class="pre">RemoteComputer</span></code>. When no target
+is supplied, falls back to the persistent default peer
+(<code class="docutils literal notranslate"><span class="pre">opendesk</span> <span class="pre">peers</span> <span class="pre">default</span> <span class="pre">&lt;name&gt;</span></code>).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="layer-5-integrations">
+<h2>Layer 5: <code class="docutils literal notranslate"><span class="pre">integrations/</span></code><a class="headerlink" href="#layer-5-integrations" title="Link to this heading">#</a></h2>
+<section id="mcp-py">
+<h3><code class="docutils literal notranslate"><span class="pre">mcp.py</span></code><a class="headerlink" href="#mcp-py" title="Link to this heading">#</a></h3>
+<p>Single MCP server. At list-tools time, augments Computer-use tool schemas
+(<code class="docutils literal notranslate"><span class="pre">screenshot</span></code>, <code class="docutils literal notranslate"><span class="pre">mouse</span></code>, <code class="docutils literal notranslate"><span class="pre">keyboard</span></code>, <code class="docutils literal notranslate"><span class="pre">ui</span></code>, <code class="docutils literal notranslate"><span class="pre">app</span></code>, <code class="docutils literal notranslate"><span class="pre">clipboard</span></code>, <code class="docutils literal notranslate"><span class="pre">ocr</span></code>) with an
+optional <code class="docutils literal notranslate"><span class="pre">peer</span></code> field; appends admin tools (<code class="docutils literal notranslate"><span class="pre">opendesk_peers</span></code>,
+<code class="docutils literal notranslate"><span class="pre">opendesk_discover</span></code>, <code class="docutils literal notranslate"><span class="pre">opendesk_use</span></code>, <code class="docutils literal notranslate"><span class="pre">opendesk_status</span></code>,
+<code class="docutils literal notranslate"><span class="pre">opendesk_capabilities</span></code>, <code class="docutils literal notranslate"><span class="pre">opendesk_disconnect</span></code>).</p>
+<p>At call-tool time, strips <code class="docutils literal notranslate"><span class="pre">peer</span></code> from arguments, resolves to a <code class="docutils literal notranslate"><span class="pre">Computer</span></code>
+via <code class="docutils literal notranslate"><span class="pre">MCPSession</span></code>, builds a fresh <code class="docutils literal notranslate"><span class="pre">ToolContext</span></code> with that Computer, and
+dispatches. Local-only tools (<code class="docutils literal notranslate"><span class="pre">learn</span></code>, <code class="docutils literal notranslate"><span class="pre">schedule</span></code>, <code class="docutils literal notranslate"><span class="pre">audit</span></code>) are passed
+through unchanged.</p>
+</section>
+<section id="mcpsession-mcp-session-py">
+<h3><code class="docutils literal notranslate"><span class="pre">MCPSession</span></code> (<code class="docutils literal notranslate"><span class="pre">mcp_session.py</span></code>)<a class="headerlink" href="#mcpsession-mcp-session-py" title="Link to this heading">#</a></h3>
+<p>Per-MCP-session state: explicit default peer, cache of open
+<code class="docutils literal notranslate"><span class="pre">RemoteComputer</span></code> connections, the local <code class="docutils literal notranslate"><span class="pre">LocalComputer</span></code>. Resolution order:</p>
+<ol class="arabic simple">
+<li><p>Per-call <code class="docutils literal notranslate"><span class="pre">peer:</span></code> argument</p></li>
+<li><p>Explicit default from <code class="docutils literal notranslate"><span class="pre">opendesk_use</span></code></p></li>
+<li><p>Lone trusted peer (implicit default)</p></li>
+<li><p>Multiple peers + no default → <strong>error</strong> (forces explicit choice)</p></li>
+<li><p>No peers paired → local</p></li>
+</ol>
+</section>
+<section id="claude-code-py-openai-compat-py-langchain-compat-py">
+<h3><code class="docutils literal notranslate"><span class="pre">claude_code.py</span></code>, <code class="docutils literal notranslate"><span class="pre">openai_compat.py</span></code>, <code class="docutils literal notranslate"><span class="pre">langchain_compat.py</span></code><a class="headerlink" href="#claude-code-py-openai-compat-py-langchain-compat-py" title="Link to this heading">#</a></h3>
+<p>Adapters that present tools in the native format of each agent SDK.</p>
+<hr class="docutils" />
+<p>Next: <a class="reference internal" href="data-flow.html"><span class="std std-doc">Data Flow →</span></a> — trace a call end-to-end, both locally and over the wire.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="protocol-layer.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Protocol Layer</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="data-flow.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Data Flow</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-4-remote">Layer 4: <code class="docutils literal notranslate"><span class="pre">remote/</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#layer-5-integrations">Layer 5: <code class="docutils literal notranslate"><span class="pre">integrations/</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mcp-py"><code class="docutils literal notranslate"><span class="pre">mcp.py</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mcpsession-mcp-session-py"><code class="docutils literal notranslate"><span class="pre">MCPSession</span></code> (<code class="docutils literal notranslate"><span class="pre">mcp_session.py</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-code-py-openai-compat-py-langchain-compat-py"><code class="docutils literal notranslate"><span class="pre">claude_code.py</span></code>, <code class="docutils literal notranslate"><span class="pre">openai_compat.py</span></code>, <code class="docutils literal notranslate"><span class="pre">langchain_compat.py</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Abhigith Neil Abraham, Fariz Rahman, Fadil Rahman
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026, Vitalops Technologies.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
