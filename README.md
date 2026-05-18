@@ -11,6 +11,7 @@ Opendesk is a computer use framework that lets AI agents navigate your computer 
 [![PyPI](https://img.shields.io/pypi/v/opendesk?label=pypi%20opendesk)](https://pypi.org/project/opendesk/)
 [![npm](https://img.shields.io/npm/v/@vitalops/opendesk-sdk?label=npm%20opendesk-sdk)](https://www.npmjs.com/package/@vitalops/opendesk-sdk)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-vitalops.github.io-blue)](https://vitalops.github.io/opendesk/docs/)
 
 </div>
 
