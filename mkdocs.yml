@@ -1,0 +1,138 @@
+site_name: OpenDesk
+
+theme:
+  name: material
+  logo: logo.png
+  palette:
+    - scheme: default
+      primary: black
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.path
+    - navigation.top
+    - navigation.instant
+    - navigation.instant.progress
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+plugins:
+  - search
+
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started/index.md
+    - Python: getting-started/python.md
+    - JavaScript / TypeScript: getting-started/javascript.md
+  - MCP:
+    - mcp/index.md
+    - Install: mcp/install.md
+    - Claude Code: mcp/claude-code.md
+    - Claude Desktop: mcp/claude-desktop.md
+    - Cursor: mcp/cursor.md
+    - Continue: mcp/continue.md
+    - Advanced: mcp/advanced.md
+    - Troubleshooting: mcp/troubleshooting.md
+  - Integrations:
+    - integrations/index.md
+    - Anthropic SDK: integrations/anthropic.md
+    - OpenAI: integrations/openai.md
+    - LangChain: integrations/langchain.md
+    - JavaScript SDK: integrations/javascript.md
+    - Custom: integrations/custom.md
+  - Tools:
+    - tools/index.md
+    - ui: tools/ui.md
+    - screenshot: tools/screenshot.md
+    - mouse: tools/mouse.md
+    - keyboard: tools/keyboard.md
+    - app: tools/app.md
+    - clipboard: tools/clipboard.md
+    - ocr: tools/ocr.md
+    - audit: tools/audit.md
+    - learn: tools/learn.md
+  - Automation:
+    - automation/index.md
+    - In Claude Code: automation/claude-code.md
+    - Python API: automation/python-api.md
+    - Scheduler: automation/scheduler.md
+  - Architecture:
+    - architecture/index.md
+    - Computer & Tools: architecture/layers.md
+    - Protocol Layer: architecture/protocol-layer.md
+    - Remote & Integrations: architecture/remote-layer.md
+    - Data Flow: architecture/data-flow.md
+    - Custom Tools: architecture/custom-tools.md
+  - Protocol:
+    - protocol/index.md
+    - Transport & Encoding: protocol/transport.md
+    - Encryption & Identity: protocol/encryption.md
+    - Pairing Handshake: protocol/pairing.md
+    - Auth Handshake: protocol/auth.md
+    - Frames & Errors: protocol/frames.md
+    - Session & Methods: protocol/session.md
+    - Discovery & Admin: protocol/discovery.md
+  - Remote — Python:
+    - remote/index.md
+    - Setup: remote/setup.md
+    - Running: remote/running.md
+    - MCP Integration: remote/mcp.md
+    - Security: remote/security.md
+    - CLI Reference: remote/cli.md
+    - Service Install: remote/service.md
+    - Concurrency: remote/concurrency.md
+    - Programmatic Use: remote/programmatic.md
+    - Troubleshooting: remote/troubleshooting.md
+  - Remote — JS/TS:
+    - remote-js/index.md
+    - Setup: remote-js/setup.md
+    - Running: remote-js/running.md
+    - MCP Integration: remote-js/mcp.md
+    - Audit Log: remote-js/audit.md
+    - Security: remote-js/security.md
+    - CLI Reference: remote-js/cli.md
+    - Concurrency: remote-js/concurrency.md
+    - Programmatic Use: remote-js/programmatic.md
+    - Troubleshooting: remote-js/troubleshooting.md
