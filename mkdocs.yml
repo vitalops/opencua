@@ -1,4 +1,5 @@
 site_name: OpenDesk
+site_url: https://vitalops.github.io/opendesk/docs/
 
 theme:
   name: material
