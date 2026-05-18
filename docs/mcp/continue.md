@@ -2,12 +2,29 @@
 
 Edit `.continue/config.json`:
 
+## Python
+
 ```json
 {
   "mcpServers": [
     {
       "name": "opendesk",
       "command": "opendesk-mcp",
+      "transport": "stdio"
+    }
+  ]
+}
+```
+
+## JavaScript / TypeScript
+
+```json
+{
+  "mcpServers": [
+    {
+      "name": "opendesk",
+      "command": "node",
+      "args": ["/path/to/node_modules/@vitalops/opendesk-sdk/bin/opendesk-mcp.js"],
       "transport": "stdio"
     }
   ]
