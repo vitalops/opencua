@@ -84,7 +84,8 @@ export class UITool extends Tool {
             end tell
           end tell`;
         await exec("osascript", ["-e", script]);
-        sandbox.recordAction("ui_click", { app: p.app, title: p.title }, "ok");
+        sandbox.recordAction("ui_click", { app: p.app, title: p.title }, "ok", undefined,
+          { action: "click", app: p.app, title: p.title, role: p.role });
         return this.ok("UI click", `Clicked '${p.title ?? p.role}' in ${p.app}.`);
       }
       case "click_menu": {
@@ -95,7 +96,8 @@ export class UITool extends Tool {
             end tell
           end tell`;
         await exec("osascript", ["-e", script]);
-        sandbox.recordAction("ui_click_menu", { app: p.app, menu: p.menu, menuItem: p.menuItem }, "ok");
+        sandbox.recordAction("ui_click_menu", { app: p.app, menu: p.menu, menuItem: p.menuItem }, "ok", undefined,
+          { action: "click_menu", app: p.app, menu: p.menu, menuItem: p.menuItem });
         return this.ok("UI click menu", `Clicked ${p.app} > ${p.menu} > ${p.menuItem}.`);
       }
       case "type": {
@@ -106,7 +108,8 @@ export class UITool extends Tool {
             end tell
           end tell`;
         await exec("osascript", ["-e", script]);
-        sandbox.recordAction("ui_type", { app: p.app }, "ok");
+        sandbox.recordAction("ui_type", { app: p.app }, "ok", undefined,
+          { action: "type", app: p.app, text: p.text });
         return this.ok("UI type", `Typed text in ${p.app}.`);
       }
       case "press_key": {
@@ -120,7 +123,8 @@ export class UITool extends Tool {
             end tell
           end tell`;
         await exec("osascript", ["-e", script]);
-        sandbox.recordAction("ui_press_key", { app: p.app, key: p.key }, "ok");
+        sandbox.recordAction("ui_press_key", { app: p.app, key: p.key }, "ok", undefined,
+          { action: "press_key", app: p.app, key: p.key, modifiers: p.modifiers ?? [] });
         return this.ok("UI press key", `Pressed ${p.key} in ${p.app}.`);
       }
       case "get_value": {
@@ -157,13 +161,15 @@ export class UITool extends Tool {
           $invokePattern = $el.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
           $invokePattern.Invoke()`;
         await script(ps);
-        sandbox.recordAction("ui_click", { app: p.app, title: p.title }, "ok");
+        sandbox.recordAction("ui_click", { app: p.app, title: p.title }, "ok", undefined,
+          { action: "click", app: p.app, title: p.title });
         return this.ok("UI click", `Clicked '${p.title}' in ${p.app}.`);
       }
       case "type": {
         const ps = `Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('${p.text}')`;
         await script(ps);
-        sandbox.recordAction("ui_type", { app: p.app }, "ok");
+        sandbox.recordAction("ui_type", { app: p.app }, "ok", undefined,
+          { action: "type", app: p.app, text: p.text });
         return this.ok("UI type", `Typed text in ${p.app}.`);
       }
       default:
@@ -180,12 +186,14 @@ export class UITool extends Tool {
     switch (p.action) {
       case "click": {
         await exec("xdotool", ["search", "--name", p.title ?? p.app, "click", "1"]);
-        sandbox.recordAction("ui_click", { app: p.app, title: p.title }, "ok");
+        sandbox.recordAction("ui_click", { app: p.app, title: p.title }, "ok", undefined,
+          { action: "click", app: p.app, title: p.title });
         return this.ok("UI click", `Clicked '${p.title}' in ${p.app}.`);
       }
       case "type": {
         await exec("xdotool", ["type", "--clearmodifiers", p.text ?? ""]);
-        sandbox.recordAction("ui_type", { app: p.app }, "ok");
+        sandbox.recordAction("ui_type", { app: p.app }, "ok", undefined,
+          { action: "type", app: p.app, text: p.text });
         return this.ok("UI type", `Typed text in ${p.app}.`);
       }
       default:

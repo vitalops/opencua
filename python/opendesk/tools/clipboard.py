@@ -44,6 +44,8 @@ class ClipboardTool(Tool):
         sandbox = get_sandbox(ctx.session_id)
         action_type = ActionType.CLIPBOARD_READ if params.action == "read" else ActionType.CLIPBOARD_WRITE
 
+        _replay_p = {"action": params.action, "text": params.text}
+
         try:
             if params.action == "read":
                 text = await ctx.computer.clipboard_text() or ""
@@ -59,12 +61,14 @@ class ClipboardTool(Tool):
                 preview = params.text[:80] + ("..." if len(params.text) > 80 else "")
                 result_msg = f"Clipboard set ({len(params.text)} chars): {preview!r}"
         except Exception as exc:
-            await sandbox.record_action(action_type, {"action": params.action}, error=str(exc))
+            await sandbox.record_action(action_type, {"action": params.action}, error=str(exc),
+                                        replay_params=_replay_p)
             return ToolResult(title="Clipboard error", output=str(exc), error=True)
 
         await sandbox.record_action(
             action_type,
             {"action": params.action, "text_len": len(params.text or "")},
             result=result_msg[:200],
+            replay_params=_replay_p,
         )
         return ToolResult(title=f"Clipboard: {params.action}", output=result_msg)

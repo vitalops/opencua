@@ -75,6 +75,14 @@ class KeyboardTool(Tool):
             "hold": ActionType.KEYBOARD_HOLD,
         }
         action_type = action_type_map[params.action]
+        _replay_p = {
+            "action": params.action,
+            "text": params.text,
+            "key": params.key,
+            "keys": params.keys,
+            "interval": params.interval,
+            "hold_duration": params.hold_duration,
+        }
 
         try:
             if params.action == "type":
@@ -131,7 +139,8 @@ class KeyboardTool(Tool):
                 await asyncio.sleep(params.settle_ms / 1000.0)
 
         except Exception as exc:
-            await sandbox.record_action(action_type, {"action": params.action}, error=str(exc))
+            await sandbox.record_action(action_type, {"action": params.action}, error=str(exc),
+                                        replay_params=_replay_p)
             return ToolResult(
                 title="Keyboard error",
                 output=f"Keyboard action failed: {exc}",
@@ -140,5 +149,6 @@ class KeyboardTool(Tool):
 
         await sandbox.record_action(
             action_type, {"action": params.action}, result=result_msg,
+            replay_params=_replay_p,
         )
         return ToolResult(title=f"Keyboard: {params.action}", output=result_msg)
