@@ -17,9 +17,13 @@ tool = AppTool()
 ## Ask Claude
 
 > "Open TextEdit"
+
 > "Open Spotify"
+
 > "Close Safari"
+
 > "Switch to Finder"
+
 > "What apps are currently running?"
 
 ---
