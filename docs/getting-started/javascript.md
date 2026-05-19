@@ -15,7 +15,23 @@ npx opendesk-js install
 npx opendesk-js uninstall   # to remove
 ```
 
-## 1. Take a screenshot
+## Try it via Claude
+
+Once registered, open Claude Code and ask:
+
+> "Take a screenshot and describe what's on my screen"
+> "Open Safari and go to google.com"
+> "Click the first button you see"
+> "Show me the audit log"
+> "Replay everything you just did"
+
+Claude calls the tools automatically — no code needed.
+
+---
+
+## SDK examples
+
+### 1. Take a screenshot
 
 ```typescript
 import { OpenDeskClient } from "@vitalops/opendesk-sdk";

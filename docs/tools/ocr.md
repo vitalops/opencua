@@ -11,7 +11,16 @@ tool = OCRTool()
 |-----------|------|---------|-------------|
 | `region` | `[x,y,w,h]` | null | Screen region to OCR; null = full screen |
 
-## Examples
+## Ask Claude
+
+> "Read the text on my screen"
+> "What does that error message say?"
+> "Extract the text from the dialog box"
+> "Read the text in the top half of the screen"
+
+---
+
+## SDK examples
 
 ```python
 params = OCRTool.Params

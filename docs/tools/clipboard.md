@@ -12,7 +12,15 @@ tool = ClipboardTool()
 | `read` | — | Return current clipboard text |
 | `write` | `text` | Set clipboard text |
 
-## Examples
+## Ask Claude
+
+> "What's in my clipboard?"
+> "Copy this text to my clipboard: 'hello world'"
+> "Paste the clipboard contents into the active window"
+
+---
+
+## SDK examples
 
 ```python
 params = ClipboardTool.Params

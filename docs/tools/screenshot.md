@@ -15,7 +15,18 @@ tool = ScreenshotTool()
 | `region` | `[x,y,w,h]` | null | Capture only this screen region |
 | `save_path` | str | null | Save PNG to disk at this absolute path |
 
-## Examples
+## Ask Claude
+
+When opendesk is connected via MCP, just describe what you want:
+
+> "Take a screenshot and tell me what's on my screen"
+> "Take a screenshot with numbered marks on every button"
+> "Show me what's in the top-right corner of the screen"
+> "Save a screenshot to /tmp/before.png"
+
+---
+
+## SDK examples
 
 ```python
 params = ScreenshotTool.Params
