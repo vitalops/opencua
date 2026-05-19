@@ -82,6 +82,8 @@ Once connected, try:
 Take a screenshot of my screen
 Click the Chrome icon
 Open Spotify and play lo-fi beats
+Show me the audit log
+Replay everything from this session
 ```
 
 ---
@@ -122,7 +124,7 @@ opendesk is built in independently-importable layers:
 │  Integrations   MCP  ·  Claude Code  ·  OpenAI  ·  LangChain │
 ├──────────────────────────────────────────────────────────────┤
 │  Tools          screenshot · mouse · keyboard · ui ·         │
-│                 clipboard · ocr · learn · schedule           │
+│                 clipboard · ocr · learn · schedule · audit   │
 ├──────────────────────────────────────────────────────────────┤
 │  Computer       LocalComputer  ·  RemoteComputer  (ABC)      │
 ├──────────────────────────────────────────────────────────────┤
