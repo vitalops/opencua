@@ -59,9 +59,10 @@ class AuditEntry:
     session_id: str
     result: str | None = None
     error: str | None = None
+    replay_params: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d = {
             "id": self.id,
             "timestamp": self.timestamp,
             "action": self.action_type.value,
@@ -70,6 +71,9 @@ class AuditEntry:
             "result": self.result,
             "error": self.error,
         }
+        if self.replay_params is not None:
+            d["replay_params"] = self.replay_params
+        return d
 
 
 @dataclass
@@ -119,6 +123,7 @@ class ComputerSandbox:
         params: dict[str, Any],
         result: str | None = None,
         error: str | None = None,
+        replay_params: dict[str, Any] | None = None,
     ) -> AuditEntry:
         """Append an entry to the audit log and return it."""
         entry = AuditEntry(
@@ -129,6 +134,7 @@ class ComputerSandbox:
             session_id=self.session_id,
             result=result,
             error=error,
+            replay_params=replay_params,
         )
         async with self._lock:
             self.audit_log.append(entry)

@@ -10,6 +10,7 @@ export interface AuditEntry {
   sessionId: string;
   result?: string;
   error?: string;
+  replayParams?: Record<string, unknown>;
 }
 
 export class ComputerSandbox {
@@ -39,6 +40,7 @@ export class ComputerSandbox {
     params: Record<string, unknown>,
     result?: string,
     error?: string,
+    replayParams?: Record<string, unknown>,
   ): AuditEntry {
     const entry: AuditEntry = {
       id: crypto.randomUUID(),
@@ -48,6 +50,7 @@ export class ComputerSandbox {
       sessionId: this.sessionId,
       result,
       error,
+      replayParams,
     };
     this.log.push(entry);
     return entry;

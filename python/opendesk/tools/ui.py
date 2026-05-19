@@ -186,13 +186,19 @@ class UITool(Tool):
 
         sandbox = get_sandbox(ctx.session_id)
 
+        _summary = {"action": params.action, "app": params.app, "title": params.title}
+        _replay_p = {
+            "action": params.action, "app": params.app, "title": params.title,
+            "role": params.role, "text": params.text, "menu": params.menu,
+            "menu_item": params.menu_item, "key": params.key, "modifiers": params.modifiers,
+            "window_index": params.window_index,
+        }
+
         try:
             result_msg = await self._dispatch(ctx, params)
         except (RuntimeError, ValueError, ImportError, NotImplementedError) as exc:
             await sandbox.record_action(
-                ActionType.UI_ACTION,
-                {"action": params.action, "app": params.app, "title": params.title},
-                error=str(exc),
+                ActionType.UI_ACTION, _summary, error=str(exc), replay_params=_replay_p,
             )
             return ToolResult(
                 title=f"UI error: {params.action} in {params.app}",
@@ -203,9 +209,7 @@ class UITool(Tool):
             return ToolResult(title=f"UI error: {params.action}", output=str(exc), error=True)
 
         await sandbox.record_action(
-            ActionType.UI_ACTION,
-            {"action": params.action, "app": params.app, "title": params.title},
-            result=result_msg[:200],
+            ActionType.UI_ACTION, _summary, result=result_msg[:200], replay_params=_replay_p,
         )
         label = params.title or params.menu_item or params.key or ""
         return ToolResult(

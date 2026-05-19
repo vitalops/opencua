@@ -133,15 +133,27 @@ class MouseTool(Tool):
             record_params["end_x"] = params.end_x
             record_params["end_y"] = params.end_y
 
+        replay_params = {
+            "action": params.action, "x": params.x, "y": params.y,
+            "direction": params.direction, "amount": params.amount,
+            "duration": params.duration, "settle_ms": params.settle_ms,
+            "image_width": params.image_width, "image_height": params.image_height,
+        }
+        if params.action == "drag":
+            replay_params["end_x"] = params.end_x
+            replay_params["end_y"] = params.end_y
+
         try:
             result_msg = await self._dispatch(ctx, params, logical_point, logical_end)
             if params.settle_ms > 0:
                 await asyncio.sleep(params.settle_ms / 1000.0)
         except Exception as exc:
-            await sandbox.record_action(action_type, record_params, error=str(exc))
+            await sandbox.record_action(action_type, record_params, error=str(exc),
+                                        replay_params=replay_params)
             return ToolResult(title="Mouse error", output=f"Mouse action failed: {exc}", error=True)
 
-        await sandbox.record_action(action_type, record_params, result=result_msg)
+        await sandbox.record_action(action_type, record_params, result=result_msg,
+                                    replay_params=replay_params)
         return ToolResult(title=f"Mouse: {params.action}", output=result_msg + scale_note)
 
     async def _to_logical(

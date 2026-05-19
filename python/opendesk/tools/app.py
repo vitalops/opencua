@@ -58,6 +58,8 @@ class AppTool(Tool):
         }
         action_type = action_type_map[params.action]
 
+        _replay_p = {"action": params.action, "name": params.name}
+
         try:
             if params.action == "list":
                 names = await ctx.computer.list_apps()
@@ -81,7 +83,7 @@ class AppTool(Tool):
         except Exception as exc:
             await sandbox.record_action(
                 action_type, {"action": params.action, "name": params.name},
-                error=str(exc),
+                error=str(exc), replay_params=_replay_p,
             )
             return ToolResult(
                 title="App error",
@@ -91,7 +93,7 @@ class AppTool(Tool):
 
         await sandbox.record_action(
             action_type, {"action": params.action, "name": params.name},
-            result=result_msg[:200],
+            result=result_msg[:200], replay_params=_replay_p,
         )
         return ToolResult(
             title=f"App: {params.action} '{params.name or ''}'",
