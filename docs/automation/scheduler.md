@@ -3,9 +3,13 @@
 ## Ask Claude
 
 > "Schedule a task called daily-backup to run every day at 9am"
+
 > "Schedule expense-report to run every Friday at 5pm"
+
 > "List my scheduled tasks"
+
 > "Run the daily-backup task now"
+
 > "Remove the hourly-check schedule"
 
 Claude adds, lists, and removes schedules. Start the daemon separately so they actually run:

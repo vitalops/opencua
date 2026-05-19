@@ -14,8 +14,11 @@ tool = OCRTool()
 ## Ask Claude
 
 > "Read the text on my screen"
+
 > "What does that error message say?"
+
 > "Extract the text from the dialog box"
+
 > "Read the text in the top half of the screen"
 
 ---

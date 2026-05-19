@@ -17,9 +17,13 @@ tool = KeyboardTool()
 ## Ask Claude
 
 > "Type 'Hello World' into the active window"
+
 > "Press Enter"
+
 > "Press Cmd+S to save"
+
 > "Press Ctrl+Z to undo"
+
 > "Press Escape"
 
 ---
