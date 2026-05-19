@@ -17,7 +17,27 @@ Requires `pip install 'opendesk[learn]'` (installs `pynput`).
 | `replay` | `task_name` | Load a procedure and return step-by-step replay instructions |
 | `list` | — | List all saved procedures in the current directory |
 
-## Examples
+## Ask Claude
+
+**Recording a workflow:**
+> "Watch me fill out this form and remember it as 'expense-report'"
+
+Claude will call `learn(start)`, wait for you to perform the task, then call `learn(stop)` and summarize what it saw.
+
+**Replaying a saved workflow:**
+> "Replay the expense-report task"
+> "Run the fill-form procedure again"
+
+**Listing saved workflows:**
+> "What tasks have you learned?"
+> "Show me all saved procedures"
+
+!!! note
+    `learn` + `replay` teaches Claude to re-execute a workflow using *current screen state* — it adapts to the environment rather than replaying raw coordinates. For exact action-by-action replay of a session, use [`audit(action='replay')`](audit.md) instead.
+
+---
+
+## SDK examples
 
 ```python
 params = LearnTool.Params

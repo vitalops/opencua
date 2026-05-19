@@ -12,6 +12,16 @@ Record a task once  →  opendesk captures clicks, keys, and screenshots
                     →  Schedule it — runs automatically on a timer
 ```
 
+## Ask Claude
+
+> "Watch me fill out this form and remember it as expense-report"
+> "Replay the expense-report task"
+> "Schedule expense-report to run every Friday at 5pm"
+> "What tasks have you learned?"
+> "List my schedules"
+
+---
+
 ## Guides
 
 - [In Claude Code](claude-code.md) — record, replay, and schedule via natural language

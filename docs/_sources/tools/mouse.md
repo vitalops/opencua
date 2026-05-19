@@ -23,7 +23,19 @@ tool = MouseTool()
 | `left_up` | `x, y` | Release left button |
 | `cursor_position` | — | Return current cursor location |
 
-## Examples
+## Ask Claude
+
+> "Click the Save button"
+> "Right-click on the Desktop"
+> "Scroll down on the page"
+> "Drag the window from the left side to the right"
+> "Where is the cursor right now?"
+
+Claude will take a screenshot first to get the dimensions, then click the right spot automatically.
+
+---
+
+## SDK examples
 
 ```python
 params = MouseTool.Params

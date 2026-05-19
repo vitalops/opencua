@@ -410,7 +410,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -426,6 +428,14 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#try-it-immediately-via-claude">Try it immediately via Claude</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -469,6 +479,18 @@
 <li><p><a class="reference internal" href="python.html"><span class="std std-doc">Python quickstart</span></a></p></li>
 <li><p><a class="reference internal" href="javascript.html"><span class="std std-doc">JavaScript / TypeScript quickstart</span></a></p></li>
 </ul>
+<hr class="docutils" />
+<section id="try-it-immediately-via-claude">
+<h2>Try it immediately via Claude<a class="headerlink" href="#try-it-immediately-via-claude" title="Link to this heading">#</a></h2>
+<p>Once installed and registered, open Claude Code and ask:</p>
+<blockquote>
+<div><p>“Take a screenshot and tell me what’s on my screen”
+“Open TextEdit and type hello world”
+“What apps are running?”
+“Click the Save button”</p>
+</div></blockquote>
+<p>No code needed — Claude calls the tools automatically.</p>
+</section>
 </section>
 
 
@@ -506,6 +528,23 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#try-it-immediately-via-claude">Try it immediately via Claude</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

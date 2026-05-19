@@ -433,6 +433,7 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude">Ask Claude</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#start-the-background-runner">Start the background runner</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#timing-formats">Timing formats</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
@@ -451,6 +452,21 @@
                   
   <section id="scheduler">
 <h1>Scheduler<a class="headerlink" href="#scheduler" title="Link to this heading">#</a></h1>
+<section id="ask-claude">
+<h2>Ask Claude<a class="headerlink" href="#ask-claude" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><p>“Schedule a task called daily-backup to run every day at 9am”
+“Schedule expense-report to run every Friday at 5pm”
+“List my scheduled tasks”
+“Run the daily-backup task now”
+“Remove the hourly-check schedule”</p>
+</div></blockquote>
+<p>Claude adds, lists, and removes schedules. Start the daemon separately so they actually run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>opendesk<span class="w"> </span>scheduler<span class="w"> </span>start
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
 <section id="start-the-background-runner">
 <h2>Start the background runner<a class="headerlink" href="#start-the-background-runner" title="Link to this heading">#</a></h2>
 <p>Schedules are saved to disk but only execute when the daemon is running:</p>
@@ -614,6 +630,7 @@ Schedules: <code class="docutils literal notranslate"><span class="pre">.opendes
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude">Ask Claude</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#start-the-background-runner">Start the background runner</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#timing-formats">Timing formats</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>

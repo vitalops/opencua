@@ -434,6 +434,7 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controlled-machine">Controlled machine</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude-on-the-controller">Ask Claude (on the controller)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controller">Controller</a></li>
 </ul>
             </nav>
@@ -457,6 +458,19 @@
 static key isn’t in <code class="docutils literal notranslate"><span class="pre">trusted-peers.json</span></code>. Logs each connection /
 disconnection to stderr. Survive reboots: see <a class="reference internal" href="service.html"><span class="std std-doc">Service Install</span></a>.</p>
 </section>
+<section id="ask-claude-on-the-controller">
+<h2>Ask Claude (on the controller)<a class="headerlink" href="#ask-claude-on-the-controller" title="Link to this heading">#</a></h2>
+<p>Once the daemon is running on the controlled machine and MCP is registered on the controller, ask Claude:</p>
+<blockquote>
+<div><p>“What machines are available?”
+“Switch to the mini machine”
+“Take a screenshot of the mini”
+“Open TextEdit on the mini and type hello”
+“What’s running on the remote machine?”</p>
+</div></blockquote>
+<p>Claude discovers, selects, and acts on remote machines automatically.</p>
+</section>
+<hr class="docutils" />
 <section id="controller">
 <h2>Controller<a class="headerlink" href="#controller" title="Link to this heading">#</a></h2>
 <p>The agent uses opendesk through the existing MCP server — pointing
@@ -522,6 +536,7 @@ opendesk<span class="w"> </span>connect<span class="w"> </span>mini<span class="
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controlled-machine">Controlled machine</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude-on-the-controller">Ask Claude (on the controller)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#controller">Controller</a></li>
 </ul>
   </nav></div>

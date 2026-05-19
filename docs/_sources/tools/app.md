@@ -14,7 +14,17 @@ tool = AppTool()
 | `focus` | `name` | Bring window to foreground |
 | `list` | — | List all running applications |
 
-## Examples
+## Ask Claude
+
+> "Open TextEdit"
+> "Open Spotify"
+> "Close Safari"
+> "Switch to Finder"
+> "What apps are currently running?"
+
+---
+
+## SDK examples
 
 ```python
 params = AppTool.Params

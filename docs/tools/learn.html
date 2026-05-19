@@ -434,7 +434,8 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actions">Actions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude">Ask Claude</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdk-examples">SDK examples</a></li>
 </ul>
             </nav>
         </div>
@@ -487,8 +488,29 @@
 </table>
 </div>
 </section>
-<section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
+<section id="ask-claude">
+<h2>Ask Claude<a class="headerlink" href="#ask-claude" title="Link to this heading">#</a></h2>
+<p><strong>Recording a workflow:</strong></p>
+<blockquote>
+<div><p>“Watch me fill out this form and remember it as ‘expense-report’”</p>
+</div></blockquote>
+<p>Claude will call <code class="docutils literal notranslate"><span class="pre">learn(start)</span></code>, wait for you to perform the task, then call <code class="docutils literal notranslate"><span class="pre">learn(stop)</span></code> and summarize what it saw.</p>
+<p><strong>Replaying a saved workflow:</strong></p>
+<blockquote>
+<div><p>“Replay the expense-report task”
+“Run the fill-form procedure again”</p>
+</div></blockquote>
+<p><strong>Listing saved workflows:</strong></p>
+<blockquote>
+<div><p>“What tasks have you learned?”
+“Show me all saved procedures”</p>
+</div></blockquote>
+<p>!!! note
+<code class="docutils literal notranslate"><span class="pre">learn</span></code> + <code class="docutils literal notranslate"><span class="pre">replay</span></code> teaches Claude to re-execute a workflow using <em>current screen state</em> — it adapts to the environment rather than replaying raw coordinates. For exact action-by-action replay of a session, use <a class="reference internal" href="audit.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">audit(action='replay')</span></code></span></a> instead.</p>
+</section>
+<hr class="docutils" />
+<section id="sdk-examples">
+<h2>SDK examples<a class="headerlink" href="#sdk-examples" title="Link to this heading">#</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="n">LearnTool</span><span class="o">.</span><span class="n">Params</span>
 
 <span class="c1"># Start recording</span>
@@ -571,7 +593,8 @@
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actions">Actions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude">Ask Claude</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdk-examples">SDK examples</a></li>
 </ul>
   </nav></div>
 

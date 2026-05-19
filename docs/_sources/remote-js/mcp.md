@@ -16,6 +16,20 @@ Run `npx opendesk-js install` on the controller as before. The MCP server now ex
 | `opendesk_capabilities [peer]` | Capability manifest of a peer. |
 | `opendesk_disconnect [peer]` | Close cached connection(s). |
 
+## Ask Claude
+
+> "What machines are paired?"
+> "Switch to the machine called mini"
+> "Take a screenshot of mini"
+> "Open Terminal on the remote machine and run ls"
+> "Use the local machine"
+> "What are the capabilities of desk?"
+> "Disconnect from mini"
+
+Claude manages peer selection automatically — you just describe which machine and what to do.
+
+---
+
 ## Default peer resolution
 
 When a tool call omits `peer:`, opendesk picks one in this order:

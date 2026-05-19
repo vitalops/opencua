@@ -14,7 +14,17 @@ tool = KeyboardTool()
 | `hotkey` | `keys` | Send a key combination: `["ctrl","c"]`, `["command","s"]` |
 | `hold` | `key`, `hold_duration` | Hold a key for N seconds then release |
 
-## Examples
+## Ask Claude
+
+> "Type 'Hello World' into the active window"
+> "Press Enter"
+> "Press Cmd+S to save"
+> "Press Ctrl+Z to undo"
+> "Press Escape"
+
+---
+
+## SDK examples
 
 ```python
 params = KeyboardTool.Params

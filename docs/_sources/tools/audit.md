@@ -1,11 +1,15 @@
 # `audit` — Session Audit Log & Replay
 
-```python
-from opendesk.tools.audit import AuditTool
-tool = AuditTool()
-```
-
 Records every action taken in the current session and lets you replay them exactly. Available in any MCP or agent session.
+
+## Ask Claude
+
+> "Show me the audit log"
+> "Show a summary of what you've done so far"
+> "Replay everything from this session"
+> "Replay the session but include failed actions too"
+
+---
 
 ## Parameters
 
@@ -16,7 +20,9 @@ Records every action taken in the current session and lets you replay them exact
 | `session_id` | str | current session | Inspect/replay a specific session by ID |
 | `skip_errors` | bool | `True` | For `action="replay"`: skip actions that originally errored |
 
-## Show the log
+## SDK examples
+
+### Show the log
 
 ```python
 params = AuditTool.Params
@@ -37,7 +43,7 @@ result = await tool.execute(ctx, params(action="show", format="full"))
 # ✓ = replayable via audit(action='replay')
 ```
 
-## Replay
+### Replay
 
 Re-executes every replayable action from the session in order. Read-only actions (screenshots, OCR, clipboard reads) are automatically skipped.
 
@@ -57,19 +63,6 @@ Include actions that originally errored:
 ```python
 result = await tool.execute(ctx, params(action="replay", skip_errors=False))
 ```
-
-## In MCP / Claude sessions
-
-In Claude Code, Claude Desktop, Cursor, or any MCP client, just ask:
-
-```
-"Show me the audit log"
-"Show audit summary"
-"Replay everything from this session"
-"Replay the session, including failed actions"
-```
-
-The agent will call the `audit` tool automatically.
 
 ## What gets replayed
 

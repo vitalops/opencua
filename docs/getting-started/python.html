@@ -434,7 +434,11 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install">Install</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#take-a-screenshot">1. Take a screenshot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#try-it-via-claude">Try it via Claude</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdk-examples">SDK examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#take-a-screenshot">1. Take a screenshot</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#click-a-button-by-name">2. Click a button by name</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#type-text">3. Type text</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-agentic-loop">4. Full agentic loop</a></li>
@@ -468,8 +472,23 @@
 </pre></div>
 </div>
 </section>
+<section id="try-it-via-claude">
+<h2>Try it via Claude<a class="headerlink" href="#try-it-via-claude" title="Link to this heading">#</a></h2>
+<p>Once registered, open Claude Code and ask:</p>
+<blockquote>
+<div><p>“Take a screenshot and describe what’s on my screen”
+“Open Safari and go to <a class="reference external" href="http://google.com">google.com</a>”
+“Click the first button you see”
+“Show me the audit log”
+“Replay everything you just did”</p>
+</div></blockquote>
+<p>Claude calls the tools automatically — no code needed.</p>
+</section>
+<hr class="docutils" />
+<section id="sdk-examples">
+<h2>SDK examples<a class="headerlink" href="#sdk-examples" title="Link to this heading">#</a></h2>
 <section id="take-a-screenshot">
-<h2>1. Take a screenshot<a class="headerlink" href="#take-a-screenshot" title="Link to this heading">#</a></h2>
+<h3>1. Take a screenshot<a class="headerlink" href="#take-a-screenshot" title="Link to this heading">#</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">opendesk</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_registry</span><span class="p">,</span> <span class="n">allow_all_context</span>
 
@@ -488,6 +507,7 @@
 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </pre></div>
 </div>
+</section>
 </section>
 <section id="click-a-button-by-name">
 <h2>2. Click a button by name<a class="headerlink" href="#click-a-button-by-name" title="Link to this heading">#</a></h2>
@@ -611,7 +631,11 @@
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install">Install</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#take-a-screenshot">1. Take a screenshot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#try-it-via-claude">Try it via Claude</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdk-examples">SDK examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#take-a-screenshot">1. Take a screenshot</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#click-a-button-by-name">2. Click a button by name</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#type-text">3. Type text</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-agentic-loop">4. Full agentic loop</a></li>

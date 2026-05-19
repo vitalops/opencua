@@ -433,10 +433,13 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude">Ask Claude</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#show-the-log">Show the log</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replay">Replay</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#in-mcp-claude-sessions">In MCP / Claude sessions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdk-examples">SDK examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#show-the-log">Show the log</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#replay">Replay</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-gets-replayed">What gets replayed</a></li>
 </ul>
             </nav>
@@ -451,11 +454,17 @@
                   
   <section id="audit-session-audit-log-replay">
 <h1><code class="docutils literal notranslate"><span class="pre">audit</span></code> — Session Audit Log &amp; Replay<a class="headerlink" href="#audit-session-audit-log-replay" title="Link to this heading">#</a></h1>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">opendesk.tools.audit</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuditTool</span>
-<span class="n">tool</span> <span class="o">=</span> <span class="n">AuditTool</span><span class="p">()</span>
-</pre></div>
-</div>
 <p>Records every action taken in the current session and lets you replay them exactly. Available in any MCP or agent session.</p>
+<section id="ask-claude">
+<h2>Ask Claude<a class="headerlink" href="#ask-claude" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><p>“Show me the audit log”
+“Show a summary of what you’ve done so far”
+“Replay everything from this session”
+“Replay the session but include failed actions too”</p>
+</div></blockquote>
+</section>
+<hr class="docutils" />
 <section id="parameters">
 <h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
@@ -491,8 +500,10 @@
 </table>
 </div>
 </section>
+<section id="sdk-examples">
+<h2>SDK examples<a class="headerlink" href="#sdk-examples" title="Link to this heading">#</a></h2>
 <section id="show-the-log">
-<h2>Show the log<a class="headerlink" href="#show-the-log" title="Link to this heading">#</a></h2>
+<h3>Show the log<a class="headerlink" href="#show-the-log" title="Link to this heading">#</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="n">AuditTool</span><span class="o">.</span><span class="n">Params</span>
 
 <span class="c1"># One-line summary</span>
@@ -513,7 +524,7 @@
 </div>
 </section>
 <section id="replay">
-<h2>Replay<a class="headerlink" href="#replay" title="Link to this heading">#</a></h2>
+<h3>Replay<a class="headerlink" href="#replay" title="Link to this heading">#</a></h3>
 <p>Re-executes every replayable action from the session in order. Read-only actions (screenshots, OCR, clipboard reads) are automatically skipped.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">tool</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">params</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;replay&quot;</span><span class="p">))</span>
 <span class="c1"># Replaying 4 action(s)...</span>
@@ -530,16 +541,6 @@
 </pre></div>
 </div>
 </section>
-<section id="in-mcp-claude-sessions">
-<h2>In MCP / Claude sessions<a class="headerlink" href="#in-mcp-claude-sessions" title="Link to this heading">#</a></h2>
-<p>In Claude Code, Claude Desktop, Cursor, or any MCP client, just ask:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Show me the audit log&quot;</span>
-<span class="s2">&quot;Show audit summary&quot;</span>
-<span class="s2">&quot;Replay everything from this session&quot;</span>
-<span class="s2">&quot;Replay the session, including failed actions&quot;</span>
-</pre></div>
-</div>
-<p>The agent will call the <code class="docutils literal notranslate"><span class="pre">audit</span></code> tool automatically.</p>
 </section>
 <section id="what-gets-replayed">
 <h2>What gets replayed<a class="headerlink" href="#what-gets-replayed" title="Link to this heading">#</a></h2>
@@ -629,10 +630,13 @@ Only actions recorded <strong>in the current session</strong> are replayable. Th
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ask-claude">Ask Claude</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters">Parameters</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#show-the-log">Show the log</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replay">Replay</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#in-mcp-claude-sessions">In MCP / Claude sessions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sdk-examples">SDK examples</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#show-the-log">Show the log</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#replay">Replay</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-gets-replayed">What gets replayed</a></li>
 </ul>
   </nav></div>
