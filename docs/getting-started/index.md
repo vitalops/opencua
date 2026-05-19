@@ -11,3 +11,16 @@ Pick your language and follow the quickstart:
 
 - [Python quickstart](python.md)
 - [JavaScript / TypeScript quickstart](javascript.md)
+
+---
+
+## Try it immediately via Claude
+
+Once installed and registered, open Claude Code and ask:
+
+> "Take a screenshot and tell me what's on my screen"
+> "Open TextEdit and type hello world"
+> "What apps are running?"
+> "Click the Save button"
+
+No code needed — Claude calls the tools automatically.

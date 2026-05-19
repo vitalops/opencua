@@ -49,6 +49,23 @@ The LLM follows the priority rule automatically because it's in each tool's desc
 
 ---
 
+## Ask Claude
+
+Once connected, just describe what you want in plain English:
+
+> "Take a screenshot and tell me what's on my screen"
+> "Click the Save button in TextEdit"
+> "Open Spotify"
+> "Type hello world into the active window"
+> "What text is in that dialog box?"
+> "Read the text on screen"
+> "Show me the audit log"
+> "Replay everything from this session"
+
+Claude decides which tool to call, calls it, and responds with the result — you never write any code.
+
+---
+
 ## Setup
 
 1. [Install](install.md) the package
