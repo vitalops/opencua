@@ -5,8 +5,11 @@ Records every action taken in the current session and lets you replay them exact
 ## Ask Claude
 
 > "Show me the audit log"
+
 > "Show a summary of what you've done so far"
+
 > "Replay everything from this session"
+
 > "Replay the session but include failed actions too"
 
 ---

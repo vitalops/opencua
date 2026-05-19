@@ -20,8 +20,11 @@ tool = ScreenshotTool()
 When opendesk is connected via MCP, just describe what you want:
 
 > "Take a screenshot and tell me what's on my screen"
+
 > "Take a screenshot with numbered marks on every button"
+
 > "Show me what's in the top-right corner of the screen"
+
 > "Save a screenshot to /tmp/before.png"
 
 ---

@@ -21,9 +21,13 @@ tool = UITool()
 ## Ask Claude
 
 > "Click the Save button in TextEdit"
+
 > "Open the File menu in Safari and click New Window"
+
 > "Type 'hello' into the search box in Finder"
+
 > "What buttons are visible in this app?"
+
 > "What's the current value of the address bar in Safari?"
 
 This is the most reliable way to interact with apps — Claude uses the accessibility tree so it doesn't need to guess pixel coordinates.

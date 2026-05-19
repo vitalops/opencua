@@ -15,9 +15,13 @@ Record a task once  →  opendesk captures clicks, keys, and screenshots
 ## Ask Claude
 
 > "Watch me fill out this form and remember it as expense-report"
+
 > "Replay the expense-report task"
+
 > "Schedule expense-report to run every Friday at 5pm"
+
 > "What tasks have you learned?"
+
 > "List my schedules"
 
 ---

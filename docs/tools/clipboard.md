@@ -15,7 +15,9 @@ tool = ClipboardTool()
 ## Ask Claude
 
 > "What's in my clipboard?"
+
 > "Copy this text to my clipboard: 'hello world'"
+
 > "Paste the clipboard contents into the active window"
 
 ---
