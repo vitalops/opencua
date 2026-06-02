@@ -55,6 +55,14 @@ class TrustedPeer:
     was last reached successfully.  Reused on the next connect so we don't
     need an mDNS round-trip — important in environments (WSL2, restricted
     networks) where mDNS doesn't traverse.
+
+    ``role`` encodes the directional trust relationship:
+    * ``"controller"`` — this peer is permitted to control *us* (stored on
+      the controlled machine after a pairing where we were the server).
+    * ``"remote"`` — we connect *to* this peer to control it (stored on the
+      controller machine after pairing as the client).
+    * ``""`` — legacy entry written before roles were introduced; treated as
+      both directions for backward compatibility.
     """
 
     public_key: str  # hex
@@ -64,6 +72,7 @@ class TrustedPeer:
     description_override: str = ""
     last_host: str = ""
     last_port: int = 0
+    role: str = ""  # "controller" | "remote" | "" (legacy)
 
     @property
     def public_bytes(self) -> bytes:
@@ -107,6 +116,7 @@ class TrustedPeers:
                     description_override=item.get("description_override", "") or "",
                     last_host=item.get("last_host", "") or "",
                     last_port=int(item.get("last_port") or 0),
+                    role=item.get("role", "") or "",
                 ))
             except (KeyError, ValueError, TypeError):
                 continue
@@ -126,6 +136,14 @@ class TrustedPeers:
         hex_key = public_key.hex()
         return any(p.public_key == hex_key for p in self._load())
 
+    def contains_as_controller(self, public_key: bytes) -> bool:
+        """True if this key is trusted to control us (role='controller' or legacy '')."""
+        hex_key = public_key.hex()
+        return any(
+            p.public_key == hex_key and p.role in ("controller", "")
+            for p in self._load()
+        )
+
     def find(self, public_key: bytes) -> Optional[TrustedPeer]:
         hex_key = public_key.hex()
         for p in self._load():
@@ -139,22 +157,32 @@ class TrustedPeers:
                 return p
         return None
 
-    def add(self, public_key: bytes, *, name: str = "") -> TrustedPeer:
+    def add(self, public_key: bytes, *, name: str = "", role: str = "") -> TrustedPeer:
         """Add or update a trusted peer.  Returns the stored entry."""
         peers = self._load()
         hex_key = public_key.hex()
         for i, p in enumerate(peers):
             if p.public_key == hex_key:
+                changed = False
+                updated_name = p.name
+                updated_role = p.role
                 if name and p.name != name:
+                    updated_name = name
+                    changed = True
+                if role and p.role != role:
+                    updated_role = role
+                    changed = True
+                if changed:
                     peers[i] = TrustedPeer(
-                        public_key=hex_key, name=name, paired_at=p.paired_at,
+                        public_key=hex_key, name=updated_name, paired_at=p.paired_at,
                         description=p.description,
                         description_override=p.description_override,
                         last_host=p.last_host, last_port=p.last_port,
+                        role=updated_role,
                     )
                     self._save(peers)
                 return peers[i]
-        peer = TrustedPeer(public_key=hex_key, name=name)
+        peer = TrustedPeer(public_key=hex_key, name=name, role=role)
         peers.append(peer)
         self._save(peers)
         return peer
@@ -178,6 +206,7 @@ class TrustedPeers:
                     description=description,
                     description_override=p.description_override,
                     last_host=p.last_host, last_port=p.last_port,
+                    role=p.role,
                 )
                 self._save(peers)
                 return True
@@ -199,6 +228,7 @@ class TrustedPeers:
                     description=p.description,
                     description_override=p.description_override,
                     last_host=host, last_port=int(port),
+                    role=p.role,
                 )
                 self._save(peers)
                 return True
@@ -213,6 +243,7 @@ class TrustedPeers:
                     public_key=p.public_key, name=p.name, paired_at=p.paired_at,
                     description=p.description, description_override=text,
                     last_host=p.last_host, last_port=p.last_port,
+                    role=p.role,
                 )
                 self._save(peers)
                 return True
@@ -230,7 +261,10 @@ class TrustedPeers:
         peers = self._load()
         for i, p in enumerate(peers):
             if p.public_key == public_key_or_name or p.name == public_key_or_name:
-                peers[i] = TrustedPeer(public_key=p.public_key, name=new_name, paired_at=p.paired_at)
+                peers[i] = TrustedPeer(
+                    public_key=p.public_key, name=new_name, paired_at=p.paired_at,
+                    role=p.role,
+                )
                 self._save(peers)
                 return True
         return False

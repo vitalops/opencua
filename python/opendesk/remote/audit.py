@@ -206,6 +206,9 @@ class AuditLog:
         self, *, date: Optional[str] = None,
     ) -> list[dict[str, Any]]:
         """Read entries from a single day's file.  Returns parsed dicts."""
+        import re
+        if date is not None and not re.fullmatch(r'\d{4}-\d{2}-\d{2}', date):
+            raise ValueError(f"invalid date format {date!r}; expected YYYY-MM-DD")
         path = self._dir / f"{date or _today_iso()}.jsonl"
         if not path.exists():
             return []

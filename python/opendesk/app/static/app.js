@@ -67,7 +67,10 @@ async function apiGet(path) {
 async function apiPost(path, body) {
     const r = await fetch(path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Opendesk-Token': window.__OPENDESK_TOKEN__ || '',
+        },
         body: body ? JSON.stringify(body) : '{}',
     });
     if (!r.ok) {

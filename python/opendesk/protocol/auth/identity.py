@@ -114,12 +114,23 @@ def _atomic_write_secret(path: Path, data: bytes) -> None:
     avoids briefly exposing the secret with world-readable permissions.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
+
     fd, tmp = tempfile.mkstemp(prefix=path.name + ".", dir=str(path.parent))
+
     try:
         os.write(fd, data)
-        os.fchmod(fd, 0o600)
+
+        try:
+            if hasattr(os, "fchmod"):
+                os.fchmod(fd, 0o600)
+            else:
+                os.chmod(tmp, stat.S_IRUSR | stat.S_IWUSR)
+        except Exception:
+            pass
+
         os.close(fd)
         os.replace(tmp, path)
+
     except BaseException:
         try:
             os.close(fd)

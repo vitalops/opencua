@@ -26,8 +26,10 @@ from typing import Any, Optional
 
 try:
     from fastapi import FastAPI, HTTPException, Query, Request
-    from fastapi.responses import FileResponse, Response
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.responses import FileResponse, HTMLResponse, Response
     from fastapi.staticfiles import StaticFiles
+    from starlette.middleware.base import BaseHTTPMiddleware
 except ImportError as _exc:  # pragma: no cover
     raise ImportError(
         "fastapi is required for the opendesk app. "
@@ -131,14 +133,53 @@ def _host_environment(state: "AppState") -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+_APP_TOKEN_FILE = "app-token"
+
+
 def create_app(state: AppState) -> FastAPI:
     """Build a FastAPI app bound to *state*.
 
     Pulled out as a factory so tests can build their own state (no real
     OpendeskServer needed) and exercise endpoints via ``TestClient``.
     """
+    import hmac
+    import secrets
+
     app = FastAPI(title="opendesk", docs_url=None, redoc_url=None)
     app.state.opendesk = state  # type: ignore[attr-defined]
+
+    # Generate a per-process secret token and write it to ~/.opendesk/app-token
+    # so CLI tools (opendesk sessions, opendesk disconnect) can authenticate.
+    _app_token = secrets.token_urlsafe(32)
+    _token_home = Path(state.home) if state.home else Path.home() / ".opendesk"
+    _token_home.mkdir(parents=True, exist_ok=True, mode=0o700)
+    _tok_path = _token_home / _APP_TOKEN_FILE
+    _tok_path.write_text(_app_token)
+    import os as _os
+    with contextlib.suppress(OSError):
+        _os.chmod(_tok_path, 0o600)
+
+    # Block state-mutating requests that don't carry the session token.
+    # GET requests are read-only and serve the HTML that bootstraps the token.
+    class _TokenMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request: Request, call_next):
+            if request.method not in ("GET", "HEAD", "OPTIONS"):
+                provided = request.headers.get("X-Opendesk-Token", "")
+                if not hmac.compare_digest(provided, _app_token):
+                    from fastapi.responses import JSONResponse
+                    return JSONResponse(
+                        {"detail": "missing or invalid X-Opendesk-Token header"},
+                        status_code=403,
+                    )
+            return await call_next(request)
+
+    app.add_middleware(_TokenMiddleware)
+    # Block all cross-origin requests so browser-based CSRF is impossible.
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[],
+        allow_credentials=False,
+    )
 
     if _STATIC_DIR.exists():
         app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
@@ -154,7 +195,11 @@ def create_app(state: AppState) -> FastAPI:
                 ),
                 media_type="text/html",
             )
-        return FileResponse(str(index_path), media_type="text/html")
+        html = index_path.read_text(encoding="utf-8")
+        # Inject the session token so the JS can include it in every POST.
+        injection = f"<script>window.__OPENDESK_TOKEN__={_app_token!r};</script>"
+        html = html.replace("</head>", f"{injection}\n</head>", 1)
+        return HTMLResponse(content=html)
 
     # ------------------------------------------------------------------
     # State endpoint
@@ -604,7 +649,7 @@ def create_app(state: AppState) -> FastAPI:
     @app.get("/api/audit")
     async def get_audit(
         req: Request,
-        date: Optional[str] = None,
+        date: Optional[str] = Query(default=None, pattern=r'^\d{4}-\d{2}-\d{2}$'),
         peer: Optional[str] = None,
         limit: int = Query(default=200, ge=1, le=2000),
     ) -> dict[str, Any]:

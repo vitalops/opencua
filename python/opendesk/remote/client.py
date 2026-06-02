@@ -140,7 +140,8 @@ async def pair_with(
         raise
 
     server_pubkey = session.peer_public
-    trusted.add(server_pubkey, name=name or _default_peer_name(server_pubkey))
+    # role="remote": we control this peer; it cannot initiate control back to us.
+    trusted.add(server_pubkey, name=name or _default_peer_name(server_pubkey), role="remote")
     trusted.cache_endpoint(server_pubkey, host, int(port))
     remote = await RemoteComputer.connect(session.connection)
     return remote, server_pubkey
@@ -178,13 +179,19 @@ async def _resolve(
         port = int(port_s) if port_s else 80
         return host, port, pubkey
 
-    # Peer name — must be in trusted-peers.
+    # Peer name — must be in trusted-peers with role="remote" (or legacy "").
     trusted = TrustedPeers(home)
     peer = trusted.find_by_name(target)
     if peer is None:
         raise ValueError(
             f"unknown peer {target!r}; run `opendesk pair {target}` first "
             "or pass an explicit URL"
+        )
+    if peer.role == "controller":
+        raise ValueError(
+            f"peer {target!r} is stored as a controller (it controls you), not as a "
+            "remote machine you can connect to. Check your peer list with "
+            "`opendesk peers`."
         )
     pubkey = peer.public_bytes
 

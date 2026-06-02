@@ -264,6 +264,7 @@ class OpendeskServer:
         self._pairing_code: Optional[str] = None
         self._pairing_event = asyncio.Event()
         self._pairing_hook: Optional[PairingHook] = None
+        self._pairing_in_progress = asyncio.Lock()  # one handshake at a time
 
     @property
     def port(self) -> int:
@@ -536,13 +537,18 @@ class OpendeskServer:
         the user finishes pairing.  This avoids the peek complication.
         """
         if self._pairing_code is not None:
-            session = await pair_server(raw, self._identity, self._pairing_code)
-            # Register the new peer.
+            # Reject simultaneous pairing attempts — only one handshake at a time.
+            if self._pairing_in_progress.locked():
+                raise AuthFailure("protocol", "another pairing handshake is in progress")
+            async with self._pairing_in_progress:
+                session = await pair_server(raw, self._identity, self._pairing_code)
+            # Register the new peer with role="controller" so it can connect back
+            # as a controller but cannot itself be connected to as a controlled machine.
             name = _default_peer_name(session.peer_public)
             if self._pairing_hook is not None:
                 await self._pairing_hook(session.peer_public, name)
             else:
-                self._trusted.add(session.peer_public, name=name)
+                self._trusted.add(session.peer_public, name=name, role="controller")
             self._pairing_event.set()
             return session, ServerMode.PAIR
 

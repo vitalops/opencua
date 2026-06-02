@@ -376,7 +376,7 @@ async def auth_server(
     e_c = _require_bytes(msg1, "e", 32)
     s_c = _require_bytes(msg1, "s", 32)
 
-    if not trusted.contains(s_c):
+    if not trusted.contains_as_controller(s_c):
         # Send a deliberately ambiguous failure: don't leak whether it was
         # an unknown key vs. a bad ephemeral.  Close after responding.
         await _send_msg(connection, {"kind": "auth_offer", "e": eph_pub, "ct": b""})

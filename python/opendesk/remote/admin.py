@@ -40,6 +40,7 @@ from opendesk.protocol.auth.identity import DEFAULT_HOME
 
 SOCKET_NAME = "admin.sock"
 PORT_FILE = "admin.port"
+TOKEN_FILE = "admin.token"
 
 _IS_WINDOWS = platform.system() == "Windows"
 
@@ -50,6 +51,10 @@ def _socket_path(home: Optional[Path]) -> Path:
 
 def _port_path(home: Optional[Path]) -> Path:
     return (Path(home) if home else DEFAULT_HOME) / PORT_FILE
+
+
+def _token_path(home: Optional[Path]) -> Path:
+    return (Path(home) if home else DEFAULT_HOME) / TOKEN_FILE
 
 
 # ---------------------------------------------------------------------------
@@ -85,17 +90,25 @@ class AdminServer:
         self._server = opendesk_server
         self._home = home
         self._asyncio_server: Optional[asyncio.AbstractServer] = None
+        self._token: str = ""
 
     async def start(self) -> None:
+        import secrets
         home = Path(self._home) if self._home else DEFAULT_HOME
         home.mkdir(parents=True, exist_ok=True, mode=0o700)
 
         if _IS_WINDOWS:
+            self._token = secrets.token_hex(32)
             srv = await asyncio.start_server(
                 self._handle, host="127.0.0.1", port=0,
             )
             port = srv.sockets[0].getsockname()[1]
             _port_path(home).write_text(str(port))
+            tok_path = _token_path(home)
+            tok_path.write_text(self._token)
+            # best-effort restriction — ineffective on Windows but harmless
+            with contextlib.suppress(OSError):
+                os.chmod(tok_path, 0o600)
         else:
             path = _socket_path(home)
             with contextlib.suppress(FileNotFoundError):
@@ -115,14 +128,24 @@ class AdminServer:
         if _IS_WINDOWS:
             with contextlib.suppress(FileNotFoundError):
                 _port_path(self._home).unlink()
+            with contextlib.suppress(FileNotFoundError):
+                _token_path(self._home).unlink()
         else:
             with contextlib.suppress(FileNotFoundError):
                 _socket_path(self._home).unlink()
 
     async def _handle(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+        import hmac
         try:
             request = await _read_frame(reader)
-            response = await self._dispatch(request)
+            if _IS_WINDOWS and self._token:
+                provided = request.get("token", "")
+                if not hmac.compare_digest(provided, self._token):
+                    response: dict = {"ok": False, "error": "unauthorized"}
+                else:
+                    response = await self._dispatch(request)
+            else:
+                response = await self._dispatch(request)
         except Exception as exc:
             response = {"ok": False, "error": str(exc)}
         try:
@@ -174,9 +197,16 @@ class AdminError(RuntimeError):
 class AdminClient:
     """Connect to the admin IPC of a running ``opendesk serve`` instance."""
 
-    def __init__(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+    def __init__(
+        self,
+        reader: asyncio.StreamReader,
+        writer: asyncio.StreamWriter,
+        *,
+        token: str = "",
+    ) -> None:
         self._reader = reader
         self._writer = writer
+        self._token = token
 
     @classmethod
     async def connect(cls, *, home: Optional[Path] = None) -> "AdminClient":
@@ -191,6 +221,8 @@ class AdminClient:
                 port = int(port_path.read_text().strip())
             except ValueError as exc:
                 raise AdminError(f"corrupt admin port file: {exc}") from exc
+            tok_path = _token_path(home)
+            token = tok_path.read_text().strip() if tok_path.exists() else ""
             reader, writer = await asyncio.open_connection("127.0.0.1", port)
         else:
             path = _socket_path(home)
@@ -199,8 +231,9 @@ class AdminClient:
                     f"No opendesk admin socket at {path}.  "
                     "Is `opendesk serve` running?"
                 )
+            token = ""
             reader, writer = await asyncio.open_unix_connection(path=str(path))
-        return cls(reader, writer)
+        return cls(reader, writer, token=token)
 
     async def aclose(self) -> None:
         with contextlib.suppress(Exception):
@@ -209,6 +242,8 @@ class AdminClient:
             await self._writer.wait_closed()
 
     async def _round_trip(self, request: dict[str, Any]) -> dict[str, Any]:
+        if self._token:
+            request = {**request, "token": self._token}
         await _write_frame(self._writer, request)
         return await _read_frame(self._reader)
 
