@@ -17,7 +17,28 @@ Opendesk is a computer use framework that lets AI agents navigate your computer 
 
 ---
 
-![opendesk demo](docs/opendesk_demo.gif)
+<table>
+<tr>
+<td align="center" width="33%">
+
+https://github.com/user-attachments/assets/5a6fab31-9f53-4ddb-9efb-17f0afe97844
+
+<b>Single Machine Demo</b><br>Screenshot, click, type, navigate — all from natural language.
+</td>
+<td align="center" width="33%">
+
+https://github.com/user-attachments/assets/629cf31b-12ab-4913-bc03-963f1cfbd682
+
+<b>Control Multiple Machines</b><br>Drive remote desktops over encrypted WebSocket — same tools, same agent.
+</td>
+<td align="center" width="33%">
+
+https://github.com/user-attachments/assets/659c9e30-e8f6-4a5a-ab81-0fa7ccaf8fb8
+
+<b>UI Testing</b><br>Test a full web app — navigate, create, verify — with zero selectors.
+</td>
+</tr>
+</table>
 
 ---
 
