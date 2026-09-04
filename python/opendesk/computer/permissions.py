@@ -100,10 +100,10 @@ def _check_screen_recording() -> PermissionStatus:
             install_hint="pip install 'opendesk[core]'",
         )
     try:
-        with mss.mss() as sct:
-            mons = sct.monitors
-            target = mons[1] if len(mons) > 1 else mons[0]
-            sct.grab({"top": target["top"], "left": target["left"], "width": 1, "height": 1})
+        # Goes through capture_screen so the macOS `screencapture` fast path
+        # is exercised (mss alone can stall ~30 s on macOS 15+/26).
+        from opendesk.computer.capture import capture_screen
+        capture_screen(region=(0, 0, 2, 2))
     except Exception as exc:
         return PermissionStatus(
             name="Screen Recording", granted=False,

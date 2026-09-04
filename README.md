@@ -106,6 +106,7 @@ Click the Chrome icon
 Open Spotify and play lo-fi beats
 Show me the audit log
 Replay everything from this session
+What was the error I saw in the terminal on Tuesday?
 ```
 
 ---
@@ -146,7 +147,8 @@ opendesk is built in independently-importable layers:
 │  Integrations   MCP  ·  Claude Code  ·  OpenAI  ·  LangChain │
 ├──────────────────────────────────────────────────────────────┤
 │  Tools          screenshot · mouse · keyboard · ui ·         │
-│                 clipboard · ocr · learn · schedule · audit   │
+│                 clipboard · ocr · learn · schedule · audit · │
+│                 memory                                       │
 ├──────────────────────────────────────────────────────────────┤
 │  Computer       LocalComputer  ·  RemoteComputer  (ABC)      │
 ├──────────────────────────────────────────────────────────────┤
@@ -165,6 +167,7 @@ opendesk is built in independently-importable layers:
 | **Remote** | `opendesk serve` / `opendesk pair`, mDNS discovery, client helper. |
 | **Protocol** | Five-frame wire protocol (msgpack binary, no base64 ever), WebSocket transport, mutual X25519 + ChaCha20-Poly1305 auth and encryption. |
 | **Automation** | `learn` + `schedule` backed by pynput recording, JSON storage, APScheduler daemon. |
+| **Memory** | `opendesk memory start` captures the screen every ~30 s, OCRs it locally, and indexes text + thumbnails in SQLite/FTS5. Per-app deny list, pause hotkey, storage cap with rolling deletion. Nothing leaves the machine. |
 
 Full details → [docs/architecture.md](docs/architecture.md)
 
@@ -183,6 +186,7 @@ Full details → [docs/architecture.md](docs/architecture.md)
 | `ocr` | Extract text from any region of the screen |
 | `learn` | Record a workflow once, replay it anytime |
 | `schedule` | Run any task or learned procedure on a timer |
+| `memory` | Screen memory — recall anything that was on screen, fully local (`opendesk memory start`) |
 
 Full reference → [docs/tools.md](docs/tools.md)
 
@@ -217,6 +221,37 @@ opendesk scheduler start
 Supported timing: `every 30m` · `every 2h` · `every day at 09:00` · `every friday at 17:00` · raw cron
 
 Full guide → [docs/automation.md](docs/automation.md)
+
+---
+
+## Screen memory
+
+A searchable, fully local history of what was on your screen — like Rewind or Recall, but open source, cross-platform, and callable by any agent.
+
+```bash
+# Python
+pip install 'opendesk[core,mcp,memory]'
+opendesk memory start            # or: opendesk memory install-service (run at login)
+
+# JavaScript / TypeScript
+npm install @vitalops/opendesk-sdk
+npx opendesk-js memory start     # or: npx opendesk-js memory install-service
+```
+
+Every ~30 s the daemon captures the screen, OCRs it **on your machine**, and stores the text plus a small thumbnail in `~/.opendesk/memory`. Then ask:
+
+```
+"What was the error message I saw in the terminal on Tuesday?"
+"Find the invoice number I had open last week"
+"Show me every time I opened that dashboard this month"
+```
+
+- **Fully local index** — SQLite + FTS5, no upload, no telemetry.
+- **Per-app deny list** — password managers excluded by default; `opendesk memory deny add "bank"` matches app names and window titles.
+- **Pause hotkey** — `Cmd/Ctrl+Shift+Alt+P`, or `opendesk memory pause 2h`.
+- **Storage cap with rolling deletion** — default 2 GB / 30 days; oldest frames go first.
+
+Full reference → [docs/tools/memory.md](docs/tools/memory.md)
 
 ---
 
@@ -293,6 +328,7 @@ pip install 'opendesk[core,mcp]'                  # + screen capture + MCP serve
 pip install 'opendesk[core,mcp,remote]'           # + control another machine over LAN
 pip install 'opendesk[core,mcp,learn]'            # + task recording and replay
 pip install 'opendesk[core,mcp,learn,schedule]'   # + scheduled tasks
+pip install 'opendesk[core,mcp,memory]'           # + screen memory (searchable desktop history)
 pip install 'opendesk[all]'                       # everything
 ```
 

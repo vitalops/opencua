@@ -7,6 +7,7 @@ import { ClipboardTool } from "./tools/clipboard.js";
 import { OCRTool } from "./tools/ocr.js";
 import { UITool } from "./tools/ui.js";
 import { AuditTool } from "./tools/audit.js";
+import { MemoryTool } from "./tools/memory.js";
 
 export class ToolRegistry {
   private tools = new Map<string, Tool>();
@@ -38,6 +39,7 @@ export function createRegistry(): ToolRegistry {
     new ClipboardTool(),
     new OCRTool(),
     new AuditTool(),
+    new MemoryTool(),
   ]) {
     registry.register(tool);
   }

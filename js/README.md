@@ -182,6 +182,48 @@ Full reference: [docs/tools.md](../docs/tools.md)
 | `app` | `client.app(params)` | Open, close, focus applications |
 | `clipboard` | `client.clipboard(params)` | Read/write system clipboard |
 | `ocr` | `client.ocr(params?)` | Extract text from screen |
+| `audit` | `client.audit(params?)` | Session audit log |
+| `memory` | `client.memory(params)` | Screen memory — search a local, OCR'd history of what was on screen |
+
+---
+
+## Screen memory
+
+A searchable, fully local history of what was on your screen. Every ~30 s a background daemon captures the screen, OCRs it **on your machine**, and stores the text plus a small thumbnail under `~/.opendesk/memory`. Nothing is uploaded.
+
+```bash
+npx opendesk-js memory start              # foreground, Ctrl-C to stop
+npx opendesk-js memory install-service    # or: run at login (launchd / systemd --user / Task Scheduler)
+npx opendesk-js memory status
+```
+
+Then ask the agent:
+
+```
+"What was the error message I saw in the terminal on Tuesday?"
+"Find the invoice number I had open last week"
+"Show me every time I opened that dashboard this month"
+```
+
+Or from code:
+
+```typescript
+const hits = await client.memory({ action: "search", query: "error", app: "Terminal", since: "tuesday" });
+const moment = await client.memory({ action: "show", id: hits.metadata.ids[0] });
+moment.attachments[0]            // { mediaType: "image/jpeg", content: Buffer }
+
+await client.memory({ action: "pause", duration: "1h" });
+await client.memory({ action: "deny", denyAdd: "bank" });
+await client.memory({ action: "config", storageCapMb: 512, retentionDays: 14 });
+```
+
+- **Per-app deny list** — matched against app name *and* window title; password managers are excluded by default. `opendesk-js memory deny add "bank"`.
+- **Pause hotkey** — `Cmd/Ctrl+Shift+Alt+P`, powered by the optional `uiohook-napi` package (`npm install uiohook-napi`). Without it, pause via `opendesk-js memory pause 2h` or the tool.
+- **Storage cap with rolling deletion** — default 2 GB / 30 days; oldest frames go first.
+- **OCR** — macOS Vision (compiled once, offline) or Windows WinRT when available, otherwise the bundled tesseract.js (downloads its English model once and caches it locally).
+- The store format is shared with the Python SDK's `opendesk memory` config, pause flag, and deny list. Run only one daemon per home.
+
+Full reference → [docs/tools/memory.md](../docs/tools/memory.md)
 
 ---
 
@@ -196,6 +238,7 @@ Your JS/TS code
 @vitalops/opendesk-sdk (Node.js)
       │
       ├── screenshot  (screenshot-desktop)
+      ├── memory  (background daemon → JSONL index + thumbnails, local OCR)
       ├── mouse/keyboard  (@nut-tree-fork/nut-js)
       ├── ui  (osascript / PowerShell UI Automation / xdotool)
       ├── ocr  (tesseract.js)

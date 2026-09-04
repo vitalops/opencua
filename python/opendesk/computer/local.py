@@ -520,6 +520,7 @@ class LocalComputer(Computer):
         return await asyncio.to_thread(self._focused_window_sync)
 
     def _focused_window_sync(self) -> Optional[Window]:
+        """Frontmost app and, where cheaply available, its front window title."""
         if _PLATFORM == "Darwin":
             try:
                 r = subprocess.run(
@@ -529,9 +530,50 @@ class LocalComputer(Computer):
                 )
                 if r.returncode == 0 and r.stdout.strip():
                     name = r.stdout.strip()
-                    return Window(id=name, title=name, app_name=name, focused=True)
+                    title = name
+                    try:
+                        r2 = subprocess.run(
+                            ["osascript", "-e",
+                             'tell application "System Events" to tell '
+                             '(first process whose frontmost is true) to '
+                             'get name of front window'],
+                            capture_output=True, text=True, timeout=5,
+                        )
+                        if r2.returncode == 0 and r2.stdout.strip():
+                            title = r2.stdout.strip()
+                    except Exception:
+                        pass
+                    return Window(id=name, title=title, app_name=name, focused=True)
             except Exception:
                 pass
+            return None
+        if _PLATFORM == "Linux":
+            if shutil.which("xdotool"):
+                try:
+                    r = subprocess.run(
+                        ["xdotool", "getactivewindow", "getwindowname"],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    title = r.stdout.strip() if r.returncode == 0 else ""
+                    r2 = subprocess.run(
+                        ["xdotool", "getactivewindow", "getwindowclassname"],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    app = r2.stdout.strip() if r2.returncode == 0 else ""
+                    if title or app:
+                        return Window(id=app or title, title=title or app, app_name=app or title, focused=True)
+                except Exception:
+                    pass
+            return None
+        if _PLATFORM == "Windows":
+            try:
+                import pygetwindow as gw  # type: ignore[import-not-found]
+                w = gw.getActiveWindow()
+                if w is not None and w.title:
+                    return Window(id=w.title, title=w.title, app_name=w.title, focused=True)
+            except Exception:
+                pass
+            return None
         return None
 
     async def focus_window(self, window_id: str) -> None:

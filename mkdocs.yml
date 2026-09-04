@@ -93,6 +93,7 @@ nav:
     - ocr: tools/ocr.md
     - audit: tools/audit.md
     - learn: tools/learn.md
+    - memory: tools/memory.md
   - Automation:
     - automation/index.md
     - In Claude Code: automation/claude-code.md

@@ -51,6 +51,7 @@ tools/clipboard
 tools/ocr
 tools/audit
 tools/learn
+tools/memory
 ```
 
 ```{toctree}

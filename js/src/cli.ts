@@ -571,6 +571,213 @@ async function cmdAudit(argv: string[]): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// memory  (screen memory — local searchable desktop history)
+// ---------------------------------------------------------------------------
+
+async function cmdMemory(argv: string[]): Promise<void> {
+  const [sub0, ...rest] = argv;
+  const sub = sub0 && !sub0.startsWith("-") ? sub0 : "status";
+  const subArgv = sub === sub0 ? rest : argv;
+  const { pos, flags } = parseFlags(subArgv);
+  const home = resolveHome(str(flags["home"]) || undefined);
+
+  switch (sub) {
+    case "start": {
+      const { startDaemon } = await import("./memory/recorder.js");
+      const interval = flags["interval"] !== undefined ? num(flags["interval"], 0) : undefined;
+      if (interval !== undefined && interval < 1) fatal("--interval must be >= 1 second");
+      await startDaemon({ home, interval: interval || undefined });
+      return;
+    }
+    case "status": {
+      await memoryStatus(home);
+      return;
+    }
+    case "pause": {
+      const { parseDuration, setPause, describePause } = await import("./memory/config.js");
+      const raw = pos[0] || str(flags["for"]) || "";
+      let secs: number | undefined;
+      if (raw) {
+        try { secs = parseDuration(raw); } catch (e) { fatal((e as Error).message, 2); }
+      }
+      const state = setPause(home, { durationSeconds: secs, reason: "cli" });
+      console.log(`Screen memory ${describePause(state)}.`);
+      return;
+    }
+    case "resume": {
+      const { clearPause } = await import("./memory/config.js");
+      console.log(clearPause(home) ? "Screen memory resumed." : "Screen memory was not paused.");
+      return;
+    }
+    case "search":
+    case "timeline":
+    case "show": {
+      await memoryQuery(home, sub, pos, flags);
+      return;
+    }
+    case "deny": {
+      const { loadConfig, saveConfig } = await import("./memory/config.js");
+      const cfg = loadConfig(home);
+      const action = pos[0] && !["list"].includes(pos[0]) ? pos[0] : "list";
+      const pattern = pos[1] ?? "";
+      if (action === "add") {
+        if (!pattern) fatal("usage: opendesk-js memory deny add <pattern>");
+        console.log(cfg.denyAdd(pattern) ? `Added '${pattern}'.` : `'${pattern}' already listed.`);
+        saveConfig(cfg, home);
+      } else if (action === "remove") {
+        if (!pattern) fatal("usage: opendesk-js memory deny remove <pattern>");
+        console.log(cfg.denyRemove(pattern) ? `Removed '${pattern}'.` : `'${pattern}' not found.`);
+        saveConfig(cfg, home);
+      } else if (action !== "list") {
+        fatal(`unknown deny subcommand: ${action}`);
+      }
+      console.log("Deny list (never captured):");
+      for (const d of cfg.deny_apps) console.log(`  - ${d}`);
+      if (!cfg.deny_apps.length) console.log("  (empty)");
+      return;
+    }
+    case "config": {
+      const { loadConfig, saveConfig } = await import("./memory/config.js");
+      const cfg = loadConfig(home);
+      let changed = false;
+      if (flags["interval"] !== undefined) { cfg.interval_seconds = num(flags["interval"], cfg.interval_seconds); changed = true; }
+      if (flags["cap"] !== undefined) { cfg.storage_cap_mb = Math.floor(num(flags["cap"], cfg.storage_cap_mb)); changed = true; }
+      if (flags["retention"] !== undefined) { cfg.retention_days = Math.floor(num(flags["retention"], cfg.retention_days)); changed = true; }
+      if (flags["hotkey"] !== undefined) { cfg.pause_hotkey = flags["hotkey"] === true ? "" : str(flags["hotkey"]); changed = true; }
+      if (changed) console.log(`Saved ${saveConfig(cfg, home)}`);
+      for (const [k, v] of Object.entries(cfg.toDict())) console.log(`  ${k}: ${Array.isArray(v) ? JSON.stringify(v) : v}`);
+      return;
+    }
+    case "clear": {
+      const { MemoryStore } = await import("./memory/store.js");
+      const { fmtRange, parseRange } = await import("./memory/timeparse.js");
+      const store = new MemoryStore(home);
+      const before = str(flags["before"]) || undefined;
+      const app = str(flags["app"]) || undefined;
+      let ids: number[] | null = null;
+      let scope = "ALL frames";
+      if (before || app) {
+        let start = 0; let end: number | null = null;
+        if (before) {
+          try { [start, end] = parseRange(undefined, before); } catch (e) { fatal((e as Error).message, 2); }
+        }
+        ids = store.timeline({ start, end, app: app ?? null, limit: Infinity }).map((f) => f.id);
+        scope = fmtRange(start, end) + (app ? `, app~'${app}'` : "");
+      }
+      const n = ids ? ids.length : store.stats().frames;
+      if (!bool(flags["yes"]) && !bool(flags["y"])) {
+        const readline = await import("readline");
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const answer = await new Promise<string>((resolve) => rl.question(`Delete ${n} frame(s) (${scope})? [y/N] `, resolve));
+        rl.close();
+        if (!answer.trim().toLowerCase().startsWith("y")) { console.log("Cancelled."); return; }
+      }
+      const deleted = ids ? store.delete(ids) : store.clear();
+      console.log(`Deleted ${deleted} frame(s).`);
+      return;
+    }
+    case "install-service": {
+      const { installMemoryService } = await import("./memory/service.js");
+      const interval = flags["interval"] !== undefined ? num(flags["interval"], 0) || undefined : undefined;
+      let result;
+      try {
+        result = installMemoryService({ home, interval, autostart: !bool(flags["no-start"]) });
+      } catch (e) {
+        fatal((e as Error).message);
+      }
+      console.log(`Screen-memory service installed (${result.manager}): ${result.path}`);
+      if (result.started) console.log("  Started.  It will also run automatically on next login.");
+      else if (bool(flags["no-start"])) console.log("  Not started (--no-start).");
+      else console.log("  WARNING: file written but the service manager could not start it.");
+      return;
+    }
+    case "uninstall-service": {
+      const { uninstallMemoryService } = await import("./memory/service.js");
+      let removed = false;
+      try { removed = uninstallMemoryService(); } catch (e) { fatal((e as Error).message); }
+      console.log(removed ? "Screen-memory service removed." : "No screen-memory service was installed.");
+      return;
+    }
+    default:
+      fatal("usage: opendesk-js memory start|status|pause|resume|search|timeline|show|deny|config|clear|install-service|uninstall-service", 2);
+  }
+}
+
+async function memoryStatus(home: string | undefined): Promise<void> {
+  const { daemonAlive, describePause, getPause, loadConfig, readDaemonState } = await import("./memory/config.js");
+  const { MemoryStore } = await import("./memory/store.js");
+  const { fmtTs } = await import("./memory/timeparse.js");
+  const cfg = loadConfig(home);
+  const pause = getPause(home);
+  const alive = daemonAlive(home);
+  const state = readDaemonState(home);
+  const store = new MemoryStore(home);
+  const st = store.stats();
+  const mb = (n: number) => (n / (1024 * 1024)).toFixed(1);
+  console.log("opendesk screen memory (js)");
+  console.log(alive
+    ? `  daemon:    running (pid ${state?.pid}, last tick: ${state?.status ?? "?"})`
+    : "  daemon:    not running — `opendesk-js memory start`");
+  console.log(`  capture:   ${pause ? "PAUSED — " + describePause(pause) : "active"}`);
+  console.log(`  store:     ${store.dir}`);
+  const span = st.frames && st.oldest !== null && st.newest !== null ? `  (${fmtTs(st.oldest)} → ${fmtTs(st.newest)})` : "";
+  console.log(`  frames:    ${st.frames}${span}`);
+  console.log(`  size:      ${mb(st.totalBytes)} MB of ${cfg.storage_cap_mb} MB cap`);
+  console.log(`  retention: ${cfg.retention_days} days   interval: every ${cfg.interval_seconds}s`);
+  console.log(`  deny list: ${cfg.deny_apps.join(", ") || "(empty)"}`);
+  console.log(`  hotkey:    ${cfg.pause_hotkey || "(disabled)"}`);
+  if (st.apps.length) console.log("  top apps:  " + st.apps.slice(0, 6).map(([a, n]) => `${a || "(unknown)"} ×${n}`).join(", "));
+}
+
+async function memoryQuery(home: string | undefined, sub: string, pos: string[], flags: Record<string, string | boolean>): Promise<void> {
+  const { MemoryStore, frameWhen } = await import("./memory/store.js");
+  const { fmtRange, parseRange } = await import("./memory/timeparse.js");
+  const store = new MemoryStore(home);
+
+  if (sub === "show") {
+    const id = Number(pos[0]);
+    if (!Number.isInteger(id)) fatal("usage: opendesk-js memory show <id>");
+    const frame = store.get(id);
+    if (!frame) fatal(`No frame with id ${id}.`);
+    console.log(`#${frame.id}  ${frameWhen(frame)}  [${frame.app || "(unknown)"}]  ${frame.title}`);
+    if (frame.thumb_path) console.log(`thumbnail: ${path.join(store.dir, frame.thumb_path)}`);
+    console.log();
+    console.log(frame.text || "(no text)");
+    return;
+  }
+
+  let start = 0; let end: number | null = null;
+  try {
+    [start, end] = parseRange(str(flags["since"]) || undefined, str(flags["until"]) || undefined);
+  } catch (e) {
+    fatal((e as Error).message, 2);
+  }
+  const app = str(flags["app"]) || null;
+  const limit = num(flags["limit"], sub === "search" ? 20 : 50);
+  let frames;
+  let label: string;
+  if (sub === "search") {
+    const query = pos.join(" ") || str(flags["query"]);
+    if (!query) fatal("usage: opendesk-js memory search <query> [--since ..] [--until ..] [--app ..]");
+    frames = store.search(query, { start, end, app, limit });
+    label = `search '${query}'`;
+  } else {
+    frames = store.timeline({ start, end, app, limit });
+    label = "timeline";
+  }
+  console.log(`${label} — ${fmtRange(start, end)}` + (app ? ` — app~'${app}'` : ""));
+  if (!frames.length) { console.log("(no results)"); return; }
+  for (const f of frames) {
+    const title = f.title && f.title !== f.app ? `  ${f.title.slice(0, 60)}` : "";
+    console.log(`#${String(f.id).padEnd(6)} ${frameWhen(f)}  [${f.app || "(unknown)"}]${title}`);
+    if (sub === "search") {
+      const snip = (f.snippet || f.text.slice(0, 120)).replace(/\n/g, " ").trim();
+      if (snip) console.log(`        ${snip.slice(0, 200)}`);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Help
 // ---------------------------------------------------------------------------
 
@@ -597,6 +804,19 @@ Shared:
   uninstall     Remove the MCP server registration from Claude Code
   mcp           Run the MCP server over stdio
 
+Screen memory (local, searchable history of what was on screen):
+  memory start            Run the capture daemon (--interval N, Ctrl-C to stop)
+  memory status           Daemon state, storage usage, config
+  memory pause [30m|2h]   Pause capture (optionally for a duration)
+  memory resume           Resume capture
+  memory search <query>   Full-text search (--since, --until, --app, --limit)
+  memory timeline         List captured moments (--since, --until, --app)
+  memory show <id>        One moment's full text + thumbnail path
+  memory deny [add|remove <pattern>]   Per-app / window-title deny list
+  memory config           --interval N --cap MB --retention DAYS --hotkey '<ctrl>+<alt>+m'
+  memory clear            Delete frames (--before <when>, --app <name>, --yes)
+  memory install-service | uninstall-service   Run the daemon at login
+
 Flags (common):
   --home=<dir>  Identity / trusted-peers directory (default: ~/.opendesk)
 
@@ -610,6 +830,8 @@ Examples:
   opendesk-js peers default laptop
   opendesk-js audit --date=2026-05-13 --peer=laptop --limit=50
   opendesk-js audit --follow
+  opendesk-js memory start --interval=30
+  opendesk-js memory search "invoice" --since="last week"
 `);
 }
 
@@ -636,6 +858,7 @@ export async function main(): Promise<void> {
       case "sessions":    return await cmdSessions(rest);
       case "disconnect":  return await cmdDisconnect(rest);
       case "audit":       return await cmdAudit(rest);
+      case "memory":      return await cmdMemory(rest);
       default:
         printHelp();
         if (command && command !== "--help" && command !== "-h") {

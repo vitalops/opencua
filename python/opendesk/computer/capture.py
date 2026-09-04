@@ -15,7 +15,11 @@ from __future__ import annotations
 
 import base64
 import io
+import os
+import platform
+from typing import Any
 
+_PLATFORM = platform.system()
 _MAX_WIDTH = 1920  # downscale Retina / 4K screens to stay under API size limits
 
 
@@ -40,17 +44,26 @@ def capture_screen(
         (System Settings → Privacy & Security → Screen Recording).
     """
     try:
-        import mss  # type: ignore[import-not-found]
-    except ImportError as exc:
-        raise ImportError(
-            "mss is required for screen capture: pip install 'opendesk[core]'"
-        ) from exc
-
-    try:
         from PIL import Image  # type: ignore[import-not-found]
     except ImportError as exc:
         raise ImportError(
             "Pillow is required for screen capture: pip install 'opendesk[core]'"
+        ) from exc
+
+    # macOS fast path: the system `screencapture` tool uses ScreenCaptureKit
+    # and returns in ~0.3 s, whereas mss's CGWindowListCreateImage path can
+    # stall for ~30 s per grab on macOS 15+/26.  Falls back to mss on any
+    # failure.  Set OPENDESK_CAPTURE=mss to force the mss path.
+    if _PLATFORM == "Darwin" and os.environ.get("OPENDESK_CAPTURE", "").lower() != "mss":
+        img = _macos_screencapture(region)
+        if img is not None:
+            return _encode(img)
+
+    try:
+        import mss  # type: ignore[import-not-found]
+    except ImportError as exc:
+        raise ImportError(
+            "mss is required for screen capture: pip install 'opendesk[core]'"
         ) from exc
 
     with mss.mss() as sct:
@@ -83,6 +96,15 @@ def capture_screen(
             "BGRX",
         )
 
+    return _encode(img)
+
+
+def _encode(img: "Any") -> tuple[bytes, int, int]:
+    """Downscale to ``_MAX_WIDTH`` if needed and PNG-encode."""
+    from PIL import Image  # type: ignore[import-not-found]
+
+    if img.mode != "RGB":
+        img = img.convert("RGB")
     if img.width > _MAX_WIDTH:
         scale = _MAX_WIDTH / img.width
         new_h = max(1, int(img.height * scale))
@@ -96,6 +118,45 @@ def capture_screen(
         raise RuntimeError("PNG encoding produced empty output.")
 
     return png_bytes, img.width, img.height
+
+
+def _macos_screencapture(
+    region: tuple[int, int, int, int] | None,
+) -> "Any | None":
+    """Capture the main display via ``/usr/sbin/screencapture``.
+
+    Returns a PIL image, or ``None`` when the tool is missing or fails (the
+    caller then falls back to mss).  ``-x`` silences the shutter sound,
+    ``-D 1`` selects the main display, ``-R`` takes logical coordinates.
+    """
+    import subprocess
+    import tempfile
+
+    from PIL import Image  # type: ignore[import-not-found]
+
+    exe = "/usr/sbin/screencapture"
+    if not os.path.exists(exe):
+        return None
+    cmd = [exe, "-x", "-D", "1", "-t", "png"]
+    if region is not None:
+        x, y, w, h = region
+        cmd += ["-R", f"{x},{y},{w},{h}"]
+    fd, tmp = tempfile.mkstemp(suffix=".png")
+    os.close(fd)
+    try:
+        r = subprocess.run(cmd + [tmp], capture_output=True, timeout=15)
+        if r.returncode != 0 or not os.path.getsize(tmp):
+            return None
+        with Image.open(tmp) as im:
+            im.load()
+            return im.convert("RGB")
+    except Exception:
+        return None
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
 
 
 def capture_screen_b64(

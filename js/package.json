@@ -32,7 +32,10 @@
     "desktop-automation",
     "mcp",
     "ai-agent",
-    "remote-control"
+    "remote-control",
+    "screen-memory",
+    "recall",
+    "desktop-history"
   ],
   "license": "MIT",
   "dependencies": {
@@ -40,6 +43,7 @@
     "@nut-tree-fork/nut-js": "^4.2.0",
     "bonjour-service": "^1.2.1",
     "clipboardy": "^4.0.0",
+    "jimp": "^0.22.10",
     "msgpackr": "^1.10.1",
     "node-cron": "^3.0.0",
     "screenshot-desktop": "^1.15.0",
@@ -60,5 +64,6 @@
     "type": "git",
     "url": "git+https://github.com/vitalops/opendesk.git",
     "directory": "js"
-  }
+  },
+  "optionalDependencies": {}
 }

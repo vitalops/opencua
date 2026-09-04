@@ -68,6 +68,17 @@ export class OpenDeskClient {
     return this.call("audit", params as Record<string, unknown>);
   }
 
+  /** Screen memory — search / show / timeline / status / pause / resume / deny / config / delete. */
+  memory(params: {
+    action: "search" | "show" | "timeline" | "status" | "pause" | "resume" | "deny" | "config" | "delete";
+    query?: string; since?: string; until?: string; app?: string; limit?: number;
+    id?: number; includeImage?: boolean; duration?: string;
+    denyAdd?: string; denyRemove?: string;
+    intervalSeconds?: number; storageCapMb?: number; retentionDays?: number; confirm?: boolean;
+  }): Promise<ToolResult> {
+    return this.call("memory", params as Record<string, unknown>);
+  }
+
   listTools(): string[] {
     return this.registry.all().map((t) => t.name);
   }
