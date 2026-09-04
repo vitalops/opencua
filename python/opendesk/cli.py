@@ -864,6 +864,213 @@ def cmd_scheduler(args) -> None:
         print("Usage: opendesk scheduler start|list")
 
 
+# ---------------------------------------------------------------------------
+# Screen memory — searchable desktop history
+# ---------------------------------------------------------------------------
+
+
+def cmd_memory(args) -> None:
+    """``opendesk memory <start|status|pause|resume|search|timeline|show|deny|config|clear|install-service|uninstall-service>``."""
+    home = Path(args.home).expanduser() if getattr(args, "home", None) else None
+    sub = args.memory_cmd or "status"
+
+    if sub == "start":
+        from opendesk.memory.recorder import start_daemon
+        from opendesk.wsl import print_advisory_if_wsl
+        _configure_logging(getattr(args, "log_file", None))
+        print_advisory_if_wsl()
+        start_daemon(home, interval=args.interval)
+        return
+
+    if sub == "status":
+        _memory_status(home)
+        return
+
+    if sub == "pause":
+        from opendesk.memory.config import parse_duration, set_pause
+        secs = None
+        if args.duration:
+            try:
+                secs = parse_duration(args.duration)
+            except ValueError as exc:
+                print(f"ERROR: {exc}", file=sys.stderr)
+                sys.exit(2)
+        state = set_pause(home, duration_seconds=secs, reason="cli")
+        print(f"Screen memory {state.describe()}.")
+        return
+
+    if sub == "resume":
+        from opendesk.memory.config import clear_pause
+        print("Screen memory resumed." if clear_pause(home) else "Screen memory was not paused.")
+        return
+
+    if sub in ("search", "timeline", "show"):
+        _memory_query(home, sub, args)
+        return
+
+    if sub == "deny":
+        from opendesk.memory.config import load_config, save_config
+        cfg = load_config(home)
+        action = args.deny_cmd or "list"
+        if action == "add":
+            print(f"Added {args.pattern!r}." if cfg.deny_add(args.pattern) else f"{args.pattern!r} already listed.")
+            save_config(cfg, home)
+        elif action == "remove":
+            print(f"Removed {args.pattern!r}." if cfg.deny_remove(args.pattern) else f"{args.pattern!r} not found.")
+            save_config(cfg, home)
+        print("Deny list (never captured):")
+        for d in cfg.deny_apps:
+            print(f"  - {d}")
+        if not cfg.deny_apps:
+            print("  (empty)")
+        return
+
+    if sub == "config":
+        from opendesk.memory.config import load_config, save_config
+        cfg = load_config(home)
+        changed = False
+        if args.interval is not None:
+            cfg.interval_seconds = float(args.interval); changed = True
+        if args.cap is not None:
+            cfg.storage_cap_mb = int(args.cap); changed = True
+        if args.retention is not None:
+            cfg.retention_days = int(args.retention); changed = True
+        if args.hotkey is not None:
+            cfg.pause_hotkey = args.hotkey; changed = True
+        if changed:
+            path = save_config(cfg, home)
+            print(f"Saved {path}")
+        for k, v in cfg.to_dict().items():
+            print(f"  {k}: {v}")
+        return
+
+    if sub == "clear":
+        from opendesk.memory.store import MemoryStore
+        from opendesk.memory.timeparse import fmt_range, parse_range
+        with MemoryStore(home) as store:
+            if args.before or args.app:
+                start, end = parse_range(None, args.before) if args.before else (0.0, None)
+                frames = store.timeline(start=start, end=end, app=args.app, limit=10_000_000)
+                ids = [f.id for f in frames]
+                scope = fmt_range(start, end) + (f", app~{args.app!r}" if args.app else "")
+            else:
+                ids = None
+                scope = "ALL frames"
+            n = len(ids) if ids is not None else store.stats().frames
+            if not args.yes:
+                answer = input(f"Delete {n} frame(s) ({scope})? [y/N] ")
+                if answer.strip().lower() not in ("y", "yes"):
+                    print("Cancelled.")
+                    return
+            deleted = store.delete(ids) if ids is not None else store.clear()
+        print(f"Deleted {deleted} frame(s).")
+        return
+
+    if sub == "install-service":
+        from opendesk.memory.service import install_memory_service
+        try:
+            result = install_memory_service(
+                home=home, interval=args.interval, autostart=not args.no_start,
+            )
+        except Exception as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            sys.exit(1)
+        print(f"✓ Screen-memory service installed ({result.manager}): {result.path}")
+        if result.started:
+            print("  Started.  It will also run automatically on next login.")
+        elif args.no_start:
+            print("  Not started (--no-start).")
+        else:
+            print("  WARNING: file written but the service manager could not start it.")
+        return
+
+    if sub == "uninstall-service":
+        from opendesk.memory.service import uninstall_memory_service
+        try:
+            removed = uninstall_memory_service()
+        except Exception as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            sys.exit(1)
+        print("✓ Screen-memory service removed." if removed else "No screen-memory service was installed.")
+        return
+
+    print("Usage: opendesk memory start|status|pause|resume|search|timeline|show|deny|config|clear")
+
+
+def _memory_status(home) -> None:
+    from opendesk.memory.config import daemon_alive, get_pause, load_config, read_daemon_state
+    from opendesk.memory.store import MemoryStore
+    from opendesk.memory.timeparse import fmt_ts
+
+    cfg = load_config(home)
+    pause = get_pause(home)
+    alive = daemon_alive(home)
+    state = read_daemon_state(home) or {}
+    with MemoryStore(home) as store:
+        st = store.stats()
+        store_dir = store.dir
+        fts = store.has_fts
+    mb = lambda n: f"{n / (1024 * 1024):.1f}"  # noqa: E731
+    print("opendesk screen memory")
+    if alive:
+        print(f"  daemon:    running (pid {state.get('pid')}, last tick: {state.get('status', '?')})")
+    else:
+        print("  daemon:    not running — `opendesk memory start`")
+    print(f"  capture:   {'PAUSED — ' + pause.describe() if pause else 'active'}")
+    print(f"  store:     {store_dir}")
+    span = f"  ({fmt_ts(st.oldest)} → {fmt_ts(st.newest)})" if st.frames and st.oldest and st.newest else ""
+    print(f"  frames:    {st.frames}{span}")
+    print(f"  size:      {mb(st.total_bytes)} MB of {cfg.storage_cap_mb} MB cap")
+    print(f"  retention: {cfg.retention_days} days   interval: every {cfg.interval_seconds:g}s")
+    print(f"  deny list: {', '.join(cfg.deny_apps) or '(empty)'}")
+    print(f"  hotkey:    {cfg.pause_hotkey or '(disabled)'}")
+    print(f"  search:    {'FTS5' if fts else 'LIKE fallback'}")
+    if st.apps:
+        print("  top apps:  " + ", ".join(f"{a or '(unknown)'} ×{n}" for a, n in st.apps[:6]))
+
+
+def _memory_query(home, sub: str, args) -> None:
+    from opendesk.memory.store import MemoryStore
+    from opendesk.memory.timeparse import fmt_range, parse_range
+
+    try:
+        start, end = parse_range(getattr(args, "since", None), getattr(args, "until", None))
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        sys.exit(2)
+
+    with MemoryStore(home) as store:
+        if sub == "show":
+            frame = store.get(args.id)
+            if frame is None:
+                print(f"No frame with id {args.id}.", file=sys.stderr)
+                sys.exit(1)
+            print(f"#{frame.id}  {frame.when}  [{frame.app or '(unknown)'}]  {frame.title}")
+            if frame.thumb_path:
+                print(f"thumbnail: {store.dir / frame.thumb_path}")
+            print()
+            print(frame.text or "(no text)")
+            return
+        if sub == "search":
+            frames = store.search(args.query, start=start, end=end, app=args.app, limit=args.limit)
+        else:
+            frames = store.timeline(start=start, end=end, app=args.app, limit=args.limit)
+
+    label = f"{sub} {args.query!r}" if sub == "search" else "timeline"
+    print(f"{label} — {fmt_range(start, end)}" + (f" — app~{args.app!r}" if args.app else ""))
+    if not frames:
+        print("(no results)")
+        return
+    for f in frames:
+        title = f"  {f.title[:60]}" if f.title and f.title != f.app else ""
+        print(f"#{f.id:<6} {f.when}  [{f.app or '(unknown)'}]{title}")
+        if sub == "search":
+            snip = (f.snippet or f.text[:120]).replace("\n", " ").strip()
+            if snip:
+                print(f"        {snip[:200]}")
+
+
+
 def main() -> None:
     import argparse
 
@@ -1116,6 +1323,84 @@ def main() -> None:
     pdesc_p.add_argument("--clear", action="store_true", help="Remove the override.")
     pdesc_p.add_argument("--home", default=None)
 
+    # --- Screen memory -------------------------------------------------
+
+    mem_p = sub.add_parser(
+        "memory",
+        help=(
+            "Screen memory: a local, searchable history of what was on screen. "
+            "Background capture every ~30s, OCR'd and indexed on this machine only."
+        ),
+    )
+    mem_p.add_argument("--home", default=None, help="opendesk home (default ~/.opendesk)")
+    mem_sub = mem_p.add_subparsers(dest="memory_cmd")
+
+    ms = mem_sub.add_parser("start", help="Run the capture daemon in the foreground (Ctrl-C to stop)")
+    ms.add_argument("--interval", type=float, default=None, help="Seconds between captures (overrides config)")
+    ms.add_argument("--log-file", default=None, help="Also write logs to this rotating file")
+    ms.add_argument("--home", default=None)
+
+    mst = mem_sub.add_parser("status", help="Daemon state, storage usage, config")
+    mst.add_argument("--home", default=None)
+
+    mp = mem_sub.add_parser("pause", help="Pause capture (optionally for a duration)")
+    mp.add_argument("duration", nargs="?", default=None, help="e.g. 30m, 2h (omit = until resumed)")
+    mp.add_argument("--home", default=None)
+
+    mr = mem_sub.add_parser("resume", help="Resume capture")
+    mr.add_argument("--home", default=None)
+
+    mq = mem_sub.add_parser("search", help="Full-text search the history")
+    mq.add_argument("query")
+    mq.add_argument("--since", default=None, help="'2h', 'yesterday', 'tuesday', 'last week', ISO date")
+    mq.add_argument("--until", default=None)
+    mq.add_argument("--app", default=None, help="Filter by app name / window title substring")
+    mq.add_argument("--limit", type=int, default=20)
+    mq.add_argument("--home", default=None)
+
+    mt = mem_sub.add_parser("timeline", help="List captured moments in a period")
+    mt.add_argument("--since", default=None)
+    mt.add_argument("--until", default=None)
+    mt.add_argument("--app", default=None)
+    mt.add_argument("--limit", type=int, default=50)
+    mt.add_argument("--home", default=None)
+
+    msh = mem_sub.add_parser("show", help="Print one moment's full text and thumbnail path")
+    msh.add_argument("id", type=int)
+    msh.add_argument("--home", default=None)
+
+    md = mem_sub.add_parser("deny", help="Manage the per-app deny list")
+    md.add_argument("--home", default=None)
+    md_sub = md.add_subparsers(dest="deny_cmd")
+    md_sub.add_parser("list", help="Show the deny list (default)").add_argument("--home", default=None)
+    mda = md_sub.add_parser("add", help="Never capture apps/titles containing this")
+    mda.add_argument("pattern")
+    mda.add_argument("--home", default=None)
+    mdr = md_sub.add_parser("remove", help="Remove an entry")
+    mdr.add_argument("pattern")
+    mdr.add_argument("--home", default=None)
+
+    mc = mem_sub.add_parser("config", help="Show / change interval, storage cap, retention, hotkey")
+    mc.add_argument("--interval", type=float, default=None, help="Seconds between captures")
+    mc.add_argument("--cap", type=int, default=None, help="Storage cap in MB (oldest frames deleted first)")
+    mc.add_argument("--retention", type=int, default=None, help="Days to keep frames")
+    mc.add_argument("--hotkey", default=None, help="Pause hotkey, pynput syntax, e.g. '<cmd>+<shift>+<alt>+p'; '' disables")
+    mc.add_argument("--home", default=None)
+
+    mcl = mem_sub.add_parser("clear", help="Delete stored frames (all, or --before / --app)")
+    mcl.add_argument("--before", default=None, help="Only frames before this time phrase, e.g. '7d', '2026-08-01'")
+    mcl.add_argument("--app", default=None, help="Only frames from this app / title substring")
+    mcl.add_argument("--yes", "-y", action="store_true", help="Skip confirmation")
+    mcl.add_argument("--home", default=None)
+
+    mis = mem_sub.add_parser("install-service", help="Run the daemon at login (launchd / systemd / Task Scheduler)")
+    mis.add_argument("--interval", type=float, default=None)
+    mis.add_argument("--no-start", action="store_true")
+    mis.add_argument("--home", default=None)
+
+    mus = mem_sub.add_parser("uninstall-service", help="Remove the login service")
+    mus.add_argument("--home", default=None)
+
     args = parser.parse_args()
 
     if args.command == "install":
@@ -1124,6 +1409,8 @@ def main() -> None:
         cmd_uninstall()
     elif args.command == "scheduler":
         cmd_scheduler(args)
+    elif args.command == "memory":
+        cmd_memory(args)
     elif args.command == "pair":
         cmd_pair(args)
     elif args.command == "pair-with":

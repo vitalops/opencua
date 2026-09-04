@@ -31,6 +31,11 @@ import type { RemoteComputer } from "./computer/remote.js";
 
 const LOCAL = "local";
 
+/** Tools that always run on this machine, never routed to a peer.  Screen
+ *  memory is deliberately local-only: the history never leaves the machine
+ *  it was recorded on. */
+const LOCAL_ONLY_TOOLS = new Set(["memory"]);
+
 interface SessionState {
   defaultPeer: string; // "local" or peer name
   remotes: Map<string, RemoteComputer>;
@@ -193,17 +198,22 @@ export function createMcpServer(registry?: ToolRegistry, ctx?: ToolContext, home
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    const localTools = reg.all().map((t) => ({
-      name: t.name,
-      description: t.description + "\n\nPass `peer` (trusted peer name) to target a remote machine instead.",
-      inputSchema: {
-        ...(t.schema as Record<string, unknown>),
-        properties: {
-          ...((t.schema as Record<string, unknown>)["properties"] as Record<string, unknown> ?? {}),
-          peer: { type: "string", description: "Target peer name (omit for local or session default)" },
+    const localTools = reg.all().map((t) => {
+      if (LOCAL_ONLY_TOOLS.has(t.name)) {
+        return { name: t.name, description: t.description, inputSchema: t.schema as Record<string, unknown> };
+      }
+      return {
+        name: t.name,
+        description: t.description + "\n\nPass `peer` (trusted peer name) to target a remote machine instead.",
+        inputSchema: {
+          ...(t.schema as Record<string, unknown>),
+          properties: {
+            ...((t.schema as Record<string, unknown>)["properties"] as Record<string, unknown> ?? {}),
+            peer: { type: "string", description: "Target peer name (omit for local or session default)" },
+          },
         },
-      },
-    }));
+      };
+    });
     return { tools: [...localTools, ...ADMIN_TOOLS] };
   });
 
@@ -219,7 +229,7 @@ export function createMcpServer(registry?: ToolRegistry, ctx?: ToolContext, home
 
     // Determine peer
     const peerArg = a["peer"] as string | undefined;
-    const effectivePeer = peerArg ?? globalState.defaultPeer;
+    const effectivePeer = LOCAL_ONLY_TOOLS.has(name) ? LOCAL : (peerArg ?? globalState.defaultPeer);
     const { peer: _p, ...toolArgs } = a;
     void _p; // consumed
 

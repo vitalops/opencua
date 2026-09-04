@@ -72,6 +72,13 @@ learn = [
     "pynput",
 ]
 
+# Screen memory — background capture + OCR + local search.  pynput powers
+# the pause hotkey; OCR uses pytesseract when present, else the native engine.
+memory = [
+    "opendesk[core]",
+    "pynput",
+]
+
 # Scheduled tasks
 schedule = [
     "apscheduler>=3.10",
@@ -94,7 +101,7 @@ app = [
 
 # Everything
 all = [
-    "opendesk[core,mcp,openai,langchain,ocr,learn,schedule,remote,app]",
+    "opendesk[core,mcp,openai,langchain,ocr,learn,memory,schedule,remote,app]",
 ]
 
 [project.scripts]

@@ -18,7 +18,9 @@ Usage::
 from __future__ import annotations
 
 import io
+import os
 import platform
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -74,6 +76,35 @@ def ocr_image(png_bytes: bytes, *, width: int = 0, height: int = 0) -> str:
     )
 
 
+def available_backend() -> str | None:
+    """Return the name of the OCR backend :func:`ocr_image` would use, or
+    ``None`` when none is usable.  Cheap: no image is processed."""
+    try:
+        import pytesseract  # type: ignore[import-not-found]
+        from PIL import Image  # type: ignore[import-not-found]  # noqa: F401
+        try:
+            pytesseract.get_tesseract_version()
+            return "pytesseract"
+        except Exception:
+            pass
+    except ImportError:
+        pass
+    if _PLATFORM == "Darwin":
+        if shutil.which("swiftc") or shutil.which("swift"):
+            return "macos-vision"
+    if _PLATFORM == "Windows":
+        if shutil.which("powershell"):
+            return "windows-winrt"
+    return None
+
+
+def warm_up() -> None:
+    """Prepare the native backend ahead of time (compiles the macOS Vision
+    helper on first use, which can take a minute).  No-op elsewhere."""
+    if _PLATFORM == "Darwin":
+        _compiled_vision_helper()
+
+
 def extract_text_from_region(
     region: tuple[int, int, int, int] | None = None,
 ) -> str:
@@ -92,43 +123,97 @@ def extract_text_from_region(
     return ocr_image(png_bytes, width=w, height=h)
 
 
-def _macos_vision_ocr(png_bytes: bytes) -> str:
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
-        f.write(png_bytes)
-        tmp_png = Path(f.name)
-
-    swift_src = f"""
+_VISION_SWIFT_SRC = """
 import Vision
 import AppKit
 
-let url = URL(fileURLWithPath: "{tmp_png}")
+let args = CommandLine.arguments
+guard args.count > 1 else { exit(2) }
+let url = URL(fileURLWithPath: args[1])
 guard let img = NSImage(contentsOf: url),
       let cgImg = img.cgImage(forProposedRect: nil, context: nil, hints: nil)
-else {{ exit(0) }}
+else { exit(0) }
 
 let req = VNRecognizeTextRequest()
 req.recognitionLevel = .accurate
 req.usesLanguageCorrection = true
 let handler = VNImageRequestHandler(cgImage: cgImg, options: [:])
 try? handler.perform([req])
-let lines = (req.results ?? []).compactMap {{ $0.topCandidates(1).first?.string }}
+let lines = (req.results ?? []).compactMap { $0.topCandidates(1).first?.string }
 print(lines.joined(separator: "\\n"))
 """
-    with tempfile.NamedTemporaryFile(suffix=".swift", delete=False, mode="w") as sf:
-        sf.write(swift_src)
-        swift_path = Path(sf.name)
+
+_VISION_HELPER_VERSION = "1"
+
+
+def _vision_helper_dir() -> Path:
+    override = os.environ.get("OPENDESK_HOME")
+    base = Path(override).expanduser() if override else Path.home() / ".opendesk"
+    d = base / "bin"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def _compiled_vision_helper() -> Path | None:
+    """Compile the Vision OCR helper once with ``swiftc`` and cache the
+    binary under ``~/.opendesk/bin``.  Returns ``None`` if compilation
+    isn't possible (no ``swiftc``), in which case callers fall back to
+    interpreting the script with ``swift`` on every call."""
+    swiftc = shutil.which("swiftc")
+    if not swiftc:
+        return None
+    d = _vision_helper_dir()
+    binary = d / f"vision-ocr-v{_VISION_HELPER_VERSION}"
+    if binary.exists() and os.access(binary, os.X_OK):
+        return binary
+    src = d / "vision-ocr.swift"
+    try:
+        src.write_text(_VISION_SWIFT_SRC)
+        r = subprocess.run(
+            [swiftc, "-O", "-o", str(binary), str(src)],
+            capture_output=True, text=True, timeout=180,
+        )
+        if r.returncode != 0 or not binary.exists():
+            return None
+        os.chmod(binary, 0o700)
+        return binary
+    except Exception:
+        return None
+    finally:
+        src.unlink(missing_ok=True)
+
+
+def _macos_vision_ocr(png_bytes: bytes) -> str:
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+        f.write(png_bytes)
+        tmp_png = Path(f.name)
 
     try:
-        r = subprocess.run(
-            ["swift", str(swift_path)],
-            capture_output=True, text=True, timeout=20,
-        )
-        if r.returncode == 0 and r.stdout.strip():
-            return r.stdout.strip()
-        raise RuntimeError(f"Swift Vision OCR failed: {r.stderr.strip()}")
+        helper = _compiled_vision_helper()
+        if helper is not None:
+            r = subprocess.run(
+                [str(helper), str(tmp_png)], capture_output=True, text=True, timeout=30,
+            )
+            if r.returncode == 0:
+                return r.stdout.strip() or "(no text detected)"
+            # Fall through to the interpreted path on unexpected failure.
+
+        swift_src = _VISION_SWIFT_SRC
+        with tempfile.NamedTemporaryFile(suffix=".swift", delete=False, mode="w") as sf:
+            sf.write(swift_src)
+            swift_path = Path(sf.name)
+        try:
+            r = subprocess.run(
+                ["swift", str(swift_path), str(tmp_png)],
+                capture_output=True, text=True, timeout=60,
+            )
+            if r.returncode == 0:
+                return r.stdout.strip() or "(no text detected)"
+            raise RuntimeError(f"Swift Vision OCR failed: {r.stderr.strip()}")
+        finally:
+            swift_path.unlink(missing_ok=True)
     finally:
         tmp_png.unlink(missing_ok=True)
-        swift_path.unlink(missing_ok=True)
 
 
 def _windows_winrt_ocr(png_bytes: bytes) -> str:

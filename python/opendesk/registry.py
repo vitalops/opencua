@@ -67,6 +67,7 @@ def create_registry() -> ToolRegistry:
     - ``ocr``        — extract text via pytesseract / Vision / WinRT
     - ``learn``      — record and replay computer tasks
     - ``audit``      — show the session audit log inside any MCP/agent session
+    - ``memory``     — search the local screen-memory history (desktop recall)
     """
     from opendesk.tools.screenshot import ScreenshotTool
     from opendesk.tools.mouse import MouseTool
@@ -77,6 +78,7 @@ def create_registry() -> ToolRegistry:
     from opendesk.tools.ocr import OCRTool
     from opendesk.tools.automation import LearnTool, ScheduleTool
     from opendesk.tools.audit import AuditTool
+    from opendesk.tools.memory import MemoryTool
 
     registry = ToolRegistry()
     for tool_cls in (
@@ -90,6 +92,7 @@ def create_registry() -> ToolRegistry:
         LearnTool,
         ScheduleTool,
         AuditTool,
+        MemoryTool,
     ):
         registry.register(tool_cls())
 

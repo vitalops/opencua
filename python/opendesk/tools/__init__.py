@@ -4,6 +4,7 @@ from opendesk.tools.app import AppTool
 from opendesk.tools.audit import AuditTool
 from opendesk.tools.clipboard import ClipboardTool
 from opendesk.tools.keyboard import KeyboardTool
+from opendesk.tools.memory import MemoryTool
 from opendesk.tools.mouse import MouseTool
 from opendesk.tools.ocr import OCRTool
 from opendesk.tools.screenshot import ScreenshotTool
@@ -14,6 +15,7 @@ __all__ = [
     "AuditTool",
     "ClipboardTool",
     "KeyboardTool",
+    "MemoryTool",
     "MouseTool",
     "OCRTool",
     "ScreenshotTool",

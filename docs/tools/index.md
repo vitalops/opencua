@@ -15,6 +15,7 @@ All tools share the same interface: `await tool.execute(ctx, params) -> ToolResu
 | [`ocr`](ocr.md) | Extract text from any screen region |
 | [`audit`](audit.md) | Read the session audit log |
 | [`learn`](learn.md) | Record and replay desktop workflows |
+| [`memory`](memory.md) | Screen memory — search a local, OCR'd history of what was on screen |
 
 ---
 

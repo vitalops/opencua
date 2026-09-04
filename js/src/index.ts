@@ -25,6 +25,16 @@ export { ToolDispatcher } from "./computer/dispatcher.js";
 export { AdminClient, AdminServer, AdminError, type SessionInfo, type SessionsProvider } from "./remote/admin.js";
 export { AuditLog, type AuditEntry } from "./remote/audit.js";
 
+// Screen memory — local, searchable desktop history
+export { MemoryTool, type MemoryToolOptions } from "./tools/memory.js";
+export {
+  MemoryStore, MemoryConfig, ScreenMemoryRecorder, startDaemon as startMemoryDaemon,
+  loadConfig as loadMemoryConfig, saveConfig as saveMemoryConfig, memoryDir,
+  getPause as getMemoryPause, setPause as setMemoryPause, clearPause as clearMemoryPause,
+  daemonAlive as memoryDaemonAlive, parseWhen, parseRange,
+  type Frame as MemoryFrame, type StoreStats as MemoryStoreStats, type RecorderOptions as MemoryRecorderOptions,
+} from "./memory/index.js";
+
 // Protocol — auth / identity
 export { Identity, generatePairingCode, fingerprint, DEFAULT_HOME } from "./protocol/auth/identity.js";
 export { TrustedPeers, type TrustedPeer } from "./protocol/auth/storage.js";
